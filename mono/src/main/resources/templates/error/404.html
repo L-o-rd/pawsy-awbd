@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pawsy ~ Not found!</title>
+    <style>
+        body {
+            font-family: 'Poppins', cursive, sans-serif;
+            background-color: #fef8f0;
+            text-align: center;
+            padding: 50px;
+            color: #333;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 72px;
+            color: #ff6f61;
+            display: inline-block;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0); }
+        }
+
+        p {
+            font-size: 24px;
+        }
+
+        .pet-image {
+            width: 220px;
+            margin: 20px auto;
+            display: block;
+            animation: wag 2s ease-in-out infinite;
+        }
+
+        @keyframes wag {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+
+        a {
+            color: #ff6f61;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #e14c3f;
+            text-decoration: lime wavy underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>404</h1>
+    <img class="pet-image" th:src="@{/images/404.png}" alt = ":(">
+    <p><a th:href="@{/}">Go back</a> and adopt a friend!</p>
+</body>
+</html>
