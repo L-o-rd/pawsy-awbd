@@ -21,7 +21,7 @@ facilitates browsing, requesting, adopting pets, scheduling appointments to meet
 |  9. | Shelter Appointments | Shelters must be able to view their upcoming appointments to prepare for their visitors. |
 | 10. | Adopter Registration | Adopters must be able to register their details (first name, last name, address information and contact information) to adopt managed pets. |
 
-### III. Main Features
+### III. Features
 ### Feature 1 ~ Pet Management
 
 **Requirements:** 2., 3. & 8. \
