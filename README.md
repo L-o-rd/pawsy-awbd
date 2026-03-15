@@ -104,3 +104,53 @@ facilitates browsing, requesting, adopting pets, scheduling appointments to meet
   * Get a list of all adopted pets by a particular adopter (user). (**GET** /api/adopters/{id}/pets)
   * Get a particular adopter. (**GET** /api/adopters/{id})
   * Filter by first name and last name.
+
+### IV. Entities
+There are 7 entities:
+
+* User
+* Address
+* Shelter
+* **Pet**
+* Appointment
+* Review
+* AdoptionRequest
+
+with the following relationships:
+![ERD](docs/diagrams/erd.png)
+
+* 1 (*explicit*) Many to Many
+* 3 One to One
+* 5 One to Many / Many to One
+
+### V. Architecture
+### 1. Monolithic Pawsy
+
+Monolithic Pawsy (*mono*) is a Spring Boot MVC web application for managing pets, shelters and adoption requests & multiple interactions with the pets.
+
+### Overview
+
+The application follows a layered architecture with domain-based modularization to allow an easier migration to micorservices:
+
+Client (Browser) &mdash; Thymeleaf Views &mdash; Controllers (Spring MVC) &mdash; Services (Business Logic) &mdash; Repositories (Spring Data JPA) &mdash; Database (MySQL or H2)
+
+### VI. Setup
+### IDE (Build System)
+
+Preferably IntelliJ with Maven & JDK 21.
+
+### Additional Tools
+
+Docker (Desktop or CLI + Compose).
+
+### Instructions
+
+* Choose a project (*mono* or *micro*).
+* Create a dot env following the example ones or just the needed variables for **arch/** and for every service.
+* Start every needed container:
+  - For *mono*:
+```bash
+docker compose -f arch/docker/docker-compose.mono.yml up -d
+```
+* Open the chosen project in an IDE or just build with Maven (clean + package).
+* Run the application from the IDE or directly using a Java Runtime.
