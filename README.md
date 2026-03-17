@@ -109,19 +109,19 @@ facilitates browsing, requesting, adopting pets, scheduling appointments to meet
 There are 7 entities:
 
 * User
-* Address
+* Role
 * Shelter
 * **Pet**
 * Appointment
 * Review
-* AdoptionRequest
+* Adoption (*Request*)
 
 with the following relationships:
 ![ERD](docs/diagrams/erd.png)
 
 * 1 (*explicit*) Many to Many
-* 3 One to One
-* 5 One to Many / Many to One
+* 1 One to One
+* 7 One to Many / Many to One
 
 ### V. Architecture
 ### 1. Monolithic Pawsy
