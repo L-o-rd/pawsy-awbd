@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Pawsy - Register</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: body}"></div>
+    <div class="form-card">
+        <h2>Create your Pawsy Account</h2>
+        <form th:action="@{/register}" th:object="${user}" method="post">
+            <label>
+                <input th:field="*{username}" placeholder="Username" required>
+            </label>
+
+            <p class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+
+            <label>
+                <input type="password" th:field="*{password}" placeholder="Password" required>
+            </label>
+
+            <p class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+
+            <label>
+                <input th:field="*{firstName}" placeholder="First name" required>
+            </label>
+
+            <label>
+                <input th:field="*{lastName}" placeholder="Last name" required>
+            </label>
+
+            <label>
+                <input th:field="*{email}" placeholder="Email" required>
+            </label>
+
+            <label>
+                <input th:field="*{phone}" placeholder="Phone" required>
+            </label>
+
+            <button type="submit">Register</button>
+
+        </form>
+        <a class="back-btn" th:href="@{/}">Go Back</a>
+    </div>
+</body>
+</html>

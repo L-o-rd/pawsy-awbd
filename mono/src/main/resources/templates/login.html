@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Pawsy - Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: body}"></div>
+    <div class="form-card">
+        <h2>Pawsy ~ Login</h2>
+        <div th:if="${param.error}" class="error">
+            Invalid username or password!
+        </div>
+
+        <div th:if="${param.logout}" class="success">
+            Logged out successfully!
+        </div>
+
+        <div th:if="${param.registered}" class="success">
+            Account created successfully!
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}"/>
+
+            <label>
+                <input type="text" name="username" placeholder="Username" required>
+            </label>
+            <label>
+                <input type="password" name="password" placeholder="Password" required>
+            </label>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <a class="back-btn" th:href="@{/}">Go Back</a>
+    </div>
+</body>
+</html>

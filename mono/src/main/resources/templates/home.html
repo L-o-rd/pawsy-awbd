@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Pawsy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <div th:replace="~{fragments/navbar :: body}"></div>
+    <div class="hero">
+        <h1>Find your new best friend 🐾</h1>
+        <p>Adopt. Love. Save a life.</p>
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>🐶 Adopt</h3>
+            <p>
+                Browse pets waiting for loving homes.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>🏠 Shelters</h3>
+            <p>
+                Partner shelters care for rescued animals.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>❤️ Save Lives</h3>
+
+            <p>
+                Every adoption gives another animal a chance.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
