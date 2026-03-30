@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+        <meta charset="UTF-8">
+        <title>Pawsy ~ Pets</title>
+        <link rel="stylesheet" th:href="@{/css/style.css}">
+        <style>
+            body {
+                font-family: 'Poppins', cursive, sans-serif;
+                background-color: #fef8f0;
+                padding: 40px;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 48px;
+                color: #ff6f61;
+            }
+
+            .sort-links a {
+                margin: 10px;
+                text-decoration: none;
+                font-weight: bold;
+                color: #ff6f61;
+            }
+
+            .sort-links a:hover {
+                text-decoration: wavy underline lime;
+            }
+
+            .pet-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+                gap: 25px;
+                margin-top: 30px;
+            }
+
+            .pet-card {
+
+                background: white;
+                border-radius: 15px;
+                padding: 15px;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+                transition: transform 0.2s;
+            }
+
+            .pet-card:hover {
+                transform: translateY(-6px);
+            }
+
+            .pet-img {
+                width: 200px;
+                height: 200px;
+                object-fit: cover;
+                border-radius: 10px;
+            }
+
+            .pet-name {
+                font-size: 24px;
+                font-weight: bold;
+                color: #444;
+            }
+
+            .pet-meta {
+                color: #666;
+                font-size: 14px;
+            }
+
+        </style>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: body}"></div>
+    <h1>🐾 Meet our pets!</h1>
+
+    <div class="sort-links">
+        Sort by:
+        <a th:href="@{/pets(sort='name')}">Name</a>
+        <a th:href="@{/pets(sort='age')}">Age</a>
+        <a th:href="@{/pets(sort='sex')}">Sex</a>
+    </div>
+
+    <div class="pet-container">
+        <div class="pet-card" th:each="pet : ${pets}">
+            <img class="pet-img"
+                 th:src="${pet.photo}"
+                 alt="pet"/>
+
+            <div class="pet-name" th:text="${pet.name}"></div>
+
+            <div class="pet-meta">
+                <p th:text="'Species: ' + ${pet.species}"></p>
+                <p th:text="'Status: ' + ${pet.status}"></p>
+                <p th:text="'Age: ' + ${pet.age}"></p>
+                <p th:text="'Sex: ' + ${pet.sex}"></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
