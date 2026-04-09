@@ -1,46 +1,129 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
+
 <head>
-    <title>Pawsy - Register</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>Register • Pawsy</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
 </head>
-<body>
-    <div th:replace="~{fragments/navbar :: body}"></div>
-    <div class="form-card">
-        <h2>Create your Pawsy Account</h2>
-        <form th:action="@{/register}" th:object="${user}" method="post">
-            <label>
-                <input th:field="*{username}" placeholder="Username" required>
-            </label>
 
-            <p class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+<body class="bg-body-tertiary">
 
-            <label>
-                <input type="password" th:field="*{password}" placeholder="Password" required>
-            </label>
+<div th:replace="~{layout/navbar :: navbar}"></div>
 
-            <p class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+<section class="bg-danger-subtle py-5">
 
-            <label>
-                <input th:field="*{firstName}" placeholder="First name" required>
-            </label>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
 
-            <label>
-                <input th:field="*{lastName}" placeholder="Last name" required>
-            </label>
+                <div class="card border-0 shadow rounded-4">
+                    <div class="card-body p-5">
 
-            <label>
-                <input th:field="*{email}" placeholder="Email" required>
-            </label>
+                        <div class="text-center mb-4">
 
-            <label>
-                <input th:field="*{phone}" placeholder="Phone" required>
-            </label>
+                            <h3 class="fw-semibold text-danger-emphasis">Create your Pawsy account</h3>
+                            <p class="text-muted">Join Pawsy and help pets find homes</p>
 
-            <button class="submit-btn" type="submit">Register</button>
+                        </div>
 
-        </form>
-        <a class="back-btn" th:href="@{/}">Go Back</a>
+                        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+                        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+                        <form th:action="@{/register}" method="post">
+
+                            <div class="row">
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input id="firstName" name="firstName" class="form-control" required>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input id="lastName" name="lastName" class="form-control" required>
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input id="username" name="username" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input id="email" name="email" type="email" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input id="phone" name="phone" class="form-control">
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input id="password" name="password" type="password" class="form-control" required>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="role" class="form-label">Account Type</label>
+
+                                    <select id="role" name="role" class="form-select">
+
+                                        <option value="ADOPTER">Adopter</option>
+                                        <option value="SHELTER">Shelter</option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-danger w-100 py-3 pawsy-btn d-flex justify-content-center align-items-center gap-2">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24">
+                                    <path d="M15 14c2.7 0 5 2.3 5 5v1H4v-1c0-2.7 2.3-5 5-5h6zm-3-2a4 4 0 100-8 4 4 0 000 8z"/>
+                                </svg>
+
+                                Register
+
+                            </button>
+
+                        </form>
+
+                        <div class="text-center mt-4">
+
+                            <p class="text-muted mb-1">Already have an account?</p>
+
+                            <a th:href="@{/login}" class="fw-semibold text-danger text-decoration-none">
+                                Login instead
+                            </a>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+    $(function(){
+        $(".pawsy-btn").hover(
+            function(){ $(this).stop().animate({marginTop:"-3px"},120); },
+            function(){ $(this).stop().animate({marginTop:"0px"},120); }
+        );
+    });
+</script>
+
 </body>
 </html>

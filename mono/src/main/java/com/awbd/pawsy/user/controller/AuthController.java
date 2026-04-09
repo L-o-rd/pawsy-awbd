@@ -1,10 +1,10 @@
 package com.awbd.pawsy.user.controller;
 
-import org.springframework.validation.BindingResult;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.stereotype.Controller;
 import com.awbd.pawsy.user.service.UserService;
 import com.awbd.pawsy.user.model.User;
@@ -24,12 +24,14 @@ public class AuthController {
     }
 
     @PostMapping
-    public String registerUser(@ModelAttribute User user, BindingResult result) {
-        if (result.hasErrors()) {
-            return "register";
+    public String registerUser(@ModelAttribute User user, RedirectAttributes at) {
+        try {
+            userService.registerUser(user);
+            at.addFlashAttribute("successMessage", "Registration successful. You can now login.");
+            return "redirect:/register";
+        } catch (Exception e) {
+            at.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/register";
         }
-
-        userService.registerUser(user);
-        return "redirect:/login?registered";
     }
 }
