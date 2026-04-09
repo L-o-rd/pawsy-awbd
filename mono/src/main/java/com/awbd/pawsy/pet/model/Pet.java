@@ -25,7 +25,7 @@ public class Pet {
     @Enumerated(EnumType.STRING)
     private PetSex sex;
 
-//    @ManyToOne(optional = false)
-//    @JoinColumn(name = "shelter_id", nullable = false)
-//    private Shelter shelter;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "shelter_id", nullable = false)
+    private Shelter shelter;
 }
