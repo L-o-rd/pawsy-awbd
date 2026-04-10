@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title th:text="${pet.name} + ' • Pawsy'">Pet</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-body-tertiary">
+
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<section class="bg-danger-subtle py-5">
+
+    <div class="container">
+
+        <div class="row g-5 align-items-start">
+
+            <!-- IMAGE -->
+            <div class="col-lg-6">
+
+                <div class="card border-0 shadow rounded-4 overflow-hidden">
+
+                    <img
+                            th:src="@{${pet.photo}}"
+                            class="w-100"
+                            style="height:420px;object-fit:cover" alt="Profile">
+
+                </div>
+
+            </div>
+
+            <!-- DETAILS -->
+            <div class="col-lg-6">
+
+                <h2 class="fw-bold text-danger-emphasis mb-2" th:text="${pet.name}">
+                    Pet Name
+                </h2>
+
+                <p class="text-muted mb-3">
+                    <span th:text="${pet.species}"></span>
+                    •
+                    <span th:text="${pet.age}"></span> years old
+                    •
+                    <span th:text="${pet.sex}"></span>
+                </p>
+
+                <span
+                        class="badge fs-6 px-3 py-2 mb-4"
+                        th:classappend="${pet.status == 'Available'} ? 'bg-success' : 'bg-secondary'"
+                        th:text="${pet.status}">
+                    Status
+                </span>
+
+                <p class="text-muted mb-4" th:text="${pet.description}">
+                    Description
+                </p>
+
+                <!-- INFO CARDS -->
+                <div class="row g-3 mb-4">
+
+                    <div class="col-6">
+
+                        <div class="card border-0 bg-white shadow-sm rounded-4 p-3 text-center">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#e83e8c" viewBox="0 0 24 24">
+                                <path d="M12 2a5 5 0 015 5c0 2.8-2.2 5-5 5s-5-2.2-5-5 2.2-5 5-5zM4 20c0-4.4 3.6-8 8-8s8 3.6 8 8H4z"/>
+                            </svg>
+
+                            <div class="fw-semibold mt-2" th:text="${pet.sex}"></div>
+
+                            <div class="small text-muted">Sex</div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-6">
+
+                        <div class="card border-0 bg-white shadow-sm rounded-4 p-3 text-center">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#e83e8c" viewBox="0 0 24 24">
+                                <path d="M12 3l9 7v11h-6v-6H9v6H3V10l9-7z"/>
+                            </svg>
+
+                            <div class="fw-semibold mt-2" th:text="${shelterName}"></div>
+
+                            <div class="small text-muted">Shelter</div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ACTION BUTTON -->
+                <div th:if="${pet.status == 'Available'}">
+
+                    <button
+                            class="btn btn-danger btn-lg w-100 py-3 pawsy-btn d-flex align-items-center justify-content-center gap-2">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 24 24">
+                            <path d="M12 21s-7-4.6-9.5-7.4C.6 11.7.6 9 2.4 7.3c1.7-1.6 4.4-1.5 6 .3L12 11l3.6-3.4c1.6-1.8 4.3-1.9 6-.3 1.8 1.7 1.8 4.4-.1 6.3C19 16.4 12 21 12 21z"/>
+                        </svg>
+
+                        Adopt Me
+
+                    </button>
+
+                </div>
+
+                <div th:if="${pet.status != 'Available'}" class="alert alert-secondary text-center mt-3">
+                    This pet has already been adopted 💗
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- OPTIONAL RELATED PETS -->
+<section class="py-5">
+
+    <div class="container">
+
+        <h4 class="fw-semibold text-danger-emphasis mb-4">Other pets you may like</h4>
+
+        <div class="row g-4">
+
+            <div class="col-md-4"
+                 th:each="p : ${relatedPets}">
+
+                <div class="card border-0 shadow-sm rounded-4 pet-card h-100">
+
+                    <img th:src="@{${p.photo}}" class="card-img-top" style="height:180px;object-fit:cover" alt="Pet Profile">
+
+                    <div class="card-body text-center">
+
+                        <h6 class="fw-semibold" th:text="${p.name}"></h6>
+
+                        <a th:href="@{/pets/{id}(id=${p.id})}"
+                           class="btn btn-outline-danger btn-sm pawsy-btn mt-2">
+                            View
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+    $(function(){
+
+        $(".pawsy-btn").hover(
+            function(){ $(this).stop().animate({marginTop:"-3px"},120); },
+            function(){ $(this).stop().animate({marginTop:"0px"},120); }
+        );
+
+        $(".pet-card").hover(
+            function(){ $(this).stop().animate({marginTop:"-6px"},150); },
+            function(){ $(this).stop().animate({marginTop:"0px"},150); }
+        );
+
+    });
+</script>
+
+</body>
+</html>

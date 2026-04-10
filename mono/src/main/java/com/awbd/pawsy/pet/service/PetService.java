@@ -2,6 +2,7 @@ package com.awbd.pawsy.pet.service;
 
 import com.awbd.pawsy.pet.specification.PetSpecifications;
 import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import com.awbd.pawsy.pet.repository.PetRepository;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import com.awbd.pawsy.pet.dto.PetMapper;
 import static java.util.Objects.isNull;
 import lombok.RequiredArgsConstructor;
 import com.awbd.pawsy.pet.model.Pet;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +54,17 @@ public class PetService {
         );
 
         return petRepository.findAll(spec, finalPageable).map(petMapper::toSummary);
+    }
+
+    public PetSummary summary(Pet pet) {
+        return petMapper.toSummary(pet);
+    }
+
+    public Pet get(Long id) {
+        return petRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pet with id %d was not found.".formatted(id)));
+    }
+
+    public List<PetSummary> related(Pet to) {
+        return List.of();
     }
 }

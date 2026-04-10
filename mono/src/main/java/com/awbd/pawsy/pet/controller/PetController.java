@@ -1,5 +1,6 @@
 package com.awbd.pawsy.pet.controller;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,5 +30,15 @@ public class PetController {
         model.addAttribute("shelters", shelterService.all());
         model.addAttribute("petsPage", pets);
         return "pets/list";
+    }
+
+    @GetMapping("/{id}")
+    public String profile(@PathVariable Long id, Model model) {
+        var pet = petService.get(id);
+        var relatedPets = petService.related(pet);
+        model.addAttribute("relatedPets", relatedPets);
+        model.addAttribute("pet", petService.summary(pet));
+        model.addAttribute("shelterName", pet.getShelter().getName());
+        return "pets/profile";
     }
 }
