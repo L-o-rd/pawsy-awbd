@@ -17,10 +17,13 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/register",
                         "/css/**", "/images/**", "/webjars/**").permitAll()
-                .anyRequest().authenticated()).formLogin(login -> login
+                .requestMatchers("/pets/create/**").hasRole("MANAGER")
+                .anyRequest().authenticated())
+                .formLogin(login -> login
                         .loginPage("/login")
                         .defaultSuccessUrl("/", true)
-                        .permitAll()).logout(logout -> logout
+                        .permitAll())
+                .logout(logout -> logout
                         .logoutSuccessUrl("/"));
 
         return http.build();

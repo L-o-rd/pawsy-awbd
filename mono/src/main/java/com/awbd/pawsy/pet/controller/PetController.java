@@ -1,22 +1,26 @@
 package com.awbd.pawsy.pet.controller;
 
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.validation.BindingResult;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
 import com.awbd.pawsy.pet.service.ShelterService;
 import org.springframework.stereotype.Controller;
 import org.springframework.data.domain.Pageable;
+import com.awbd.pawsy.user.service.UserService;
+import com.awbd.pawsy.pet.dto.PetCreateRequest;
 import com.awbd.pawsy.pet.service.PetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
+import jakarta.validation.Valid;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/pets")
 public class PetController {
     private final ShelterService shelterService;
+    private final UserService userService;
     private final PetService petService;
 
     @GetMapping
@@ -35,10 +39,42 @@ public class PetController {
     @GetMapping("/{id}")
     public String profile(@PathVariable Long id, Model model) {
         var pet = petService.get(id);
-        var relatedPets = petService.related(pet);
+        var relatedPets = petService.related(id);
         model.addAttribute("relatedPets", relatedPets);
         model.addAttribute("pet", petService.summary(pet));
         model.addAttribute("shelterName", pet.getShelter().getName());
         return "pets/profile";
+    }
+
+    @GetMapping("/create")
+    public String createPage(Model model) {
+        model.addAttribute("pet", new PetCreateRequest(null, null, null, null, null, null));
+        return "pets/create";
+    }
+
+    @PostMapping("/create")
+    public String createPet(@Valid @ModelAttribute("pet") PetCreateRequest dto,
+                            BindingResult result,
+                            RedirectAttributes redirect) {
+
+        if (result.hasErrors()) {
+            redirect.addFlashAttribute("errorMessage", result.getAllErrors().toString());
+            return "redirect:pets/create";
+        }
+
+        try {
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null) {
+                throw new RuntimeException("User not logged in.");
+            }
+
+            var user = userService.getByUsername(auth.getName());
+            var createdPet = petService.create(dto, shelterService.getByManager(user));
+            redirect.addFlashAttribute("successMessage", "Pet added successfully!");
+            return "redirect:/pets/%d".formatted(createdPet.getId());
+        } catch (Exception e) {
+            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/pets/create";
+        }
     }
 }

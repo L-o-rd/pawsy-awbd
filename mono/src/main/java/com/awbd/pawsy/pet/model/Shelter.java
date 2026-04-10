@@ -1,5 +1,6 @@
 package com.awbd.pawsy.pet.model;
 
+import com.awbd.pawsy.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,4 +18,8 @@ public class Shelter {
     private String location;
     private String email;
     private String phone;
+
+    @OneToOne(optional = false)
+    @JoinColumn(name = "manager_id")
+    private User manager;
 }

@@ -6,12 +6,16 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import com.awbd.pawsy.pet.repository.PetRepository;
 import org.springframework.data.domain.Pageable;
+import com.awbd.pawsy.pet.dto.PetCreateRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import com.awbd.pawsy.pet.model.PetStatus;
 import com.awbd.pawsy.pet.dto.PetSummary;
 import com.awbd.pawsy.pet.dto.PetMapper;
+import com.awbd.pawsy.pet.model.Shelter;
 import static java.util.Objects.isNull;
+import com.awbd.pawsy.pet.model.PetSex;
 import lombok.RequiredArgsConstructor;
 import com.awbd.pawsy.pet.model.Pet;
 import java.util.List;
@@ -64,7 +68,20 @@ public class PetService {
         return petRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pet with id %d was not found.".formatted(id)));
     }
 
-    public List<PetSummary> related(Pet to) {
+    public Pet create(PetCreateRequest dto, Shelter shelter) {
+        var pet = new Pet();
+        pet.setAge(dto.age());
+        pet.setSex(PetSex.valueOf(dto.sex()));
+        pet.setName(dto.name());
+        pet.setPhoto(dto.photo());
+        pet.setDescription(dto.description());
+        pet.setShelter(shelter);
+        pet.setSpecies(dto.species());
+        pet.setStatus(PetStatus.Available);
+        return petRepository.save(pet);
+    }
+
+    public List<PetSummary> related(Long id) {
         return List.of();
     }
 }
