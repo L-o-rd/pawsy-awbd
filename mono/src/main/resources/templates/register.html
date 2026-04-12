@@ -29,56 +29,46 @@
                         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
                         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-                        <form th:action="@{/register}" method="post">
+                        <form th:action="@{/register}" method="post" th:object="${user}">
 
                             <div class="row">
 
                                 <div class="col-md-6 mb-3">
                                     <label for="firstName" class="form-label">First Name</label>
-                                    <input id="firstName" name="firstName" class="form-control" required>
+                                    <input type="text" th:field="*{firstName}" id="firstName" name="firstName" class="form-control" required>
+                                    <div class="text-danger small" th:errors="*{firstName}"></div>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label for="lastName" class="form-label">Last Name</label>
-                                    <input id="lastName" name="lastName" class="form-control" required>
+                                    <input type="text" id="lastName" th:field="*{lastName}" name="lastName" class="form-control" required>
+                                    <div class="text-danger small" th:errors="*{lastName}"></div>
                                 </div>
 
                             </div>
 
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
-                                <input id="username" name="username" class="form-control" required>
+                                <input type="text" th:field="*{username}" id="username" name="username" class="form-control" required>
+                                <div class="text-danger small" th:errors="*{username}"></div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input id="email" name="email" type="email" class="form-control" required>
+                                <input id="email" name="email" th:field="*{email}" type="email" class="form-control" required>
+                                <div class="text-danger small" th:errors="*{email}"></div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Phone</label>
-                                <input id="phone" name="phone" class="form-control">
+                                <input id="phone" name="phone" th:field="*{phone}" class="form-control" required>
+                                <div class="text-danger small" th:errors="*{phone}"></div>
                             </div>
 
-                            <div class="row">
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <input id="password" name="password" type="password" class="form-control" required>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="role" class="form-label">Account Type</label>
-
-                                    <select id="role" name="role" class="form-select">
-
-                                        <option value="ADOPTER">Adopter</option>
-                                        <option value="SHELTER">Shelter</option>
-
-                                    </select>
-
-                                </div>
-
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input id="password" name="password" th:field="*{password}" type="password" class="form-control" required>
+                                <div class="text-danger small" th:errors="*{password}"></div>
                             </div>
 
                             <button type="submit"
