@@ -16,9 +16,6 @@ public interface PetMapper {
     @Mapping(target = "photo", expression = "java(resolvePhoto(pet.getPhoto()))")
     PetSummary toSummary(Pet pet);
 
-    @Mapping(target = "photo", expression = "java(resolvePhoto(pet.getPhoto()))")
-    PetCreateRequest toCreateRequest(Pet pet);
-
     default String resolvePhoto(String photoUrl) {
         return (photoUrl == null || photoUrl.isBlank()) ? DEFAULT_PHOTO : photoUrl;
     }
