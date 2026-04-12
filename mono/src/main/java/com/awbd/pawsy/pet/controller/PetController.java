@@ -58,8 +58,7 @@ public class PetController {
                             RedirectAttributes redirect) {
 
         if (result.hasErrors()) {
-            redirect.addFlashAttribute("errorMessage", result.getAllErrors().toString());
-            return "redirect:pets/create";
+            return "pets/create";
         }
 
         try {

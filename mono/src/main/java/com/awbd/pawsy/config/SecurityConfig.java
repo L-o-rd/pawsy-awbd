@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final PawsyUserDetailsService userDetailsService;
+    private final PawsyUserDetailsService pawsyUserDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -25,7 +25,7 @@ public class SecurityConfig {
                         "/css/**", "/images/**", "/webjars/**").permitAll()
                 .requestMatchers("/pets/create/**").hasRole("MANAGER")
                 .anyRequest().authenticated())
-                .userDetailsService(userDetailsService)
+                .userDetailsService(pawsyUserDetailsService)
                 .formLogin(login -> login
                         .loginPage("/login")
                         .defaultSuccessUrl("/", true)
