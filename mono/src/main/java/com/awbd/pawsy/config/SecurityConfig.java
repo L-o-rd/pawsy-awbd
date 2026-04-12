@@ -6,11 +6,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.context.annotation.Configuration;
+import com.awbd.pawsy.security.PawsyUserDetailsService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Bean;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
+@Profile("dev")
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final PawsyUserDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -19,6 +25,7 @@ public class SecurityConfig {
                         "/css/**", "/images/**", "/webjars/**").permitAll()
                 .requestMatchers("/pets/create/**").hasRole("MANAGER")
                 .anyRequest().authenticated())
+                .userDetailsService(userDetailsService)
                 .formLogin(login -> login
                         .loginPage("/login")
                         .defaultSuccessUrl("/", true)

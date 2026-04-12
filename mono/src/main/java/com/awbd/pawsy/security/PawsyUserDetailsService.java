@@ -4,12 +4,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.context.annotation.Profile;
 import com.awbd.pawsy.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.jspecify.annotations.NullMarked;
 import lombok.RequiredArgsConstructor;
+import java.util.stream.Collectors;
 
 @Service
+@Profile("dev")
 @RequiredArgsConstructor
 public class PawsyUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
@@ -23,9 +26,12 @@ public class PawsyUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
+                user.getEnabled(),
+                user.getAccountNonExpired(),
+                user.getCredentialsNonExpired(),
+                user.getAccountNonLocked(),
                 user.getRoles().stream()
                         .map(role -> new SimpleGrantedAuthority(role.getName()))
-                        .toList()
-        );
+                        .collect(Collectors.toSet()));
     }
 }
