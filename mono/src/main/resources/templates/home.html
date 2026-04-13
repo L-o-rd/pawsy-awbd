@@ -1,40 +1,154 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
+
 <head>
+
     <title>Pawsy</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+
 </head>
 
-<body>
-    <div th:replace="~{fragments/navbar :: body}"></div>
-    <div class="hero">
-        <h1>Find your new best friend!</h1>
-        <p>Adopt. Love. Save a life.</p>
+<body class="bg-body-tertiary">
+
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<section class="bg-danger-subtle py-5 border-bottom">
+    <div class="container py-5">
+
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-6">
+
+                <h1 class="display-4 fw-bold text-danger-emphasis mb-3">
+                    Find Your New Best Friend
+                </h1>
+
+                <p class="lead text-secondary mb-4">
+                    Pawsy connects loving families with pets from trusted shelters and rescues.
+                </p>
+
+                <div class="d-flex gap-3 flex-wrap">
+
+                    <a th:href="@{/pets}" class="btn btn-danger btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 shadow-sm pawsy-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M4.5 9A2.5 2.5 0 117 6.5 2.5 2.5 0 014.5 9zm6-3A2.5 2.5 0 1113 3.5 2.5 2.5 0 0110.5 6zm6 3A2.5 2.5 0 1119 6.5 2.5 2.5 0 0116.5 9zM12 11c-3.5 0-6 2.5-6 4.5S8 20 12 20s6-1.5 6-4.5S15.5 11 12 11z"/>
+                        </svg>
+                        Browse Pets
+                    </a>
+
+                    <a th:href="@{/shelters}" class="btn btn-outline-danger btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 pawsy-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 3l9 7v11h-6v-6H9v6H3V10l9-7z"/>
+                        </svg>
+                        Shelters
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+
+                <div class="card border-0 shadow rounded-4">
+
+                    <div class="card-body p-5 text-center">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="#e83e8c" viewBox="0 0 24 24">
+                            <path d="M4.5 9A2.5 2.5 0 117 6.5 2.5 2.5 0 014.5 9zm6-3A2.5 2.5 0 1113 3.5 2.5 2.5 0 0110.5 6zm6 3A2.5 2.5 0 1119 6.5 2.5 2.5 0 0116.5 9zM12 11c-3.5 0-6 2.5-6 4.5S8 20 12 20s6-1.5 6-4.5S15.5 11 12 11z"/>
+                        </svg>
+
+                        <h4 class="fw-semibold mt-4 mb-3">
+                            Thousands of pets are waiting for a home
+                        </h4>
+
+                        <p class="text-muted">
+                            Adopt responsibly and help animals find loving families.
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
     </div>
+</section>
 
-    <div class="cards">
+<section class="py-5">
+    <div class="container">
 
-        <div class="card">
-            <h3>🐶 Adopt</h3>
-            <p>
-                Browse pets waiting for loving homes.
-            </p>
-        </div>
+        <div class="row g-4">
 
-        <div class="card">
-            <h3>🏠 Shelters</h3>
-            <p>
-                Partner shelters care for rescued animals.
-            </p>
-        </div>
+            <div class="col-md-4">
 
-        <div class="card">
-            <h3>❤️ Save Lives</h3>
+                <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
 
-            <p>
-                Every adoption gives another animal a chance.
-            </p>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="#e83e8c" viewBox="0 0 24 24">
+                        <path d="M12 21s-7-4.6-9.5-7.4C.6 11.7.6 9 2.4 7.3c1.7-1.6 4.4-1.5 6 .3L12 11l3.6-3.4c1.6-1.8 4.3-1.9 6-.3 1.8 1.7 1.8 4.4-.1 6.3C19 16.4 12 21 12 21z"/>
+                    </svg>
+
+                    <h5 class="fw-semibold mt-3 mb-2">Discover Pets</h5>
+                    <p class="text-muted mb-3">Browse animals looking for loving homes.</p>
+
+                    <a th:href="@{/pets}" class="btn btn-outline-danger pawsy-btn">
+                        View Pets
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="#e83e8c" viewBox="0 0 24 24">
+                        <path d="M12 3l9 7v11h-6v-6H9v6H3V10l9-7z"/>
+                    </svg>
+
+                    <h5 class="fw-semibold mt-3 mb-2">Shelters</h5>
+                    <p class="text-muted mb-3">Explore shelters and adoption centers.</p>
+
+                    <a th:href="@{/shelters}" class="btn btn-outline-danger pawsy-btn">
+                        View Shelters
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="#e83e8c" viewBox="0 0 24 24">
+                        <path d="M12 21s-6.7-4.35-9.33-7.1C.6 11.73.5 9.28 2.3 7.6c1.74-1.64 4.4-1.52 6.02.25L12 11.6l3.68-3.75c1.62-1.77 4.28-1.9 6.02-.25 1.8 1.68 1.7 4.13-.37 6.3C18.7 16.65 12 21 12 21z"/>
+                    </svg>
+
+                    <h5 class="fw-semibold mt-3 mb-2">Adopt Responsibly</h5>
+                    <p class="text-muted mb-3">Give pets the loving homes they deserve.</p>
+
+                    <a th:href="@{/about}" class="btn btn-outline-danger pawsy-btn">
+                        Learn More
+                    </a>
+
+                </div>
+            </div>
+
         </div>
     </div>
+</section>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+    $(function(){
+        $(".pawsy-btn").hover(
+            function(){ $(this).stop().animate({marginTop:"-3px"},120); },
+            function(){ $(this).stop().animate({marginTop:"0px"},120); }
+        );
+    });
+</script>
+
 </body>
 </html>
