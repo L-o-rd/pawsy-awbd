@@ -31,4 +31,20 @@ public class ShelterController {
         model.addAttribute("petsPage", petsPage);
         return "shelters/pets";
     }
+
+    @GetMapping
+    public String all(@RequestParam(required = false) String name,
+                       @RequestParam(required = false) String location,
+                       @RequestParam(defaultValue = "name") String sort,
+                       @RequestParam(defaultValue = "0") Integer page,
+                       @RequestParam(defaultValue = "12") Integer size,
+                       Model model) {
+
+        var sheltersPage = shelterService.search(name, location, sort, page, size);
+        model.addAttribute("sheltersPage", sheltersPage);
+        model.addAttribute("name", name);
+        model.addAttribute("location", location);
+        model.addAttribute("sort", sort);
+        return "shelters/list";
+    }
 }

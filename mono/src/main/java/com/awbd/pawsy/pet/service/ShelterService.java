@@ -1,17 +1,28 @@
 package com.awbd.pawsy.pet.service;
 
+import com.awbd.pawsy.pet.dto.ShelterMapper;
+import com.awbd.pawsy.pet.dto.ShelterSummary;
 import com.awbd.pawsy.pet.repository.ShelterRepository;
+import com.awbd.pawsy.pet.specification.ShelterSpecifications;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import com.awbd.pawsy.pet.model.Shelter;
 import lombok.RequiredArgsConstructor;
 import com.awbd.pawsy.user.model.User;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @Service
 @RequiredArgsConstructor
 public class ShelterService {
     private final ShelterRepository shelterRepository;
+    private final ShelterMapper shelterMapper;
 
     public List<Shelter> all() {
         return shelterRepository.findAll();
@@ -23,5 +34,30 @@ public class ShelterService {
 
     public Shelter getByManager(User user) {
         return shelterRepository.findByManagerId(user.getId()).orElseThrow(() -> new EntityNotFoundException("Manager with id %d has no shelter.".formatted(user.getId())));
+    }
+
+    public Page<ShelterSummary> search(String name, String location, String sort, Integer page, Integer size) {
+        Specification<Shelter> spec = (root, query, cb) -> cb.conjunction();
+
+        if (!isNull(name) && !name.isBlank()) {
+            spec = spec.and(ShelterSpecifications.nameContains(name));
+        }
+
+        if (!isNull(location) && !location.isBlank()) {
+            spec = spec.and(ShelterSpecifications.locationContains(location));
+        }
+
+        var sorting = switch (sort) {
+            case "location" -> Sort.by("location").ascending();
+            default -> Sort.by("name").ascending();
+        };
+
+        Pageable finalPageable = PageRequest.of(
+            page,
+            size,
+            sorting
+        );
+
+        return shelterRepository.findAll(spec, finalPageable).map(shelterMapper::toSummary);
     }
 }
