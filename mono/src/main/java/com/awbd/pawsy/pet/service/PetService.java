@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import com.awbd.pawsy.pet.repository.PetRepository;
 import org.springframework.data.domain.Pageable;
 import com.awbd.pawsy.pet.dto.PetCreateRequest;
+import com.awbd.pawsy.pet.dto.PetUpdateRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -25,6 +26,12 @@ import java.util.List;
 public class PetService {
     private final PetRepository petRepository;
     private final PetMapper petMapper;
+
+    public Page<PetSummary> getPetsForShelter(Shelter shelter, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").descending());
+        return petRepository.findByShelterId(shelter.getId(), pageable)
+                .map(petMapper::toSummary);
+    }
 
     public Page<PetSummary> search(String name, String species, String sex, Long shelterId, String sort, Pageable pageable) {
         Specification<Pet> spec = (root, query, cb) -> cb.conjunction();
@@ -81,7 +88,35 @@ public class PetService {
         return petRepository.save(pet);
     }
 
-    public List<PetSummary> related(Long id) {
+    public List<PetSummary> related(Long ignored) {
         return List.of();
+    }
+
+    public PetUpdateRequest getForUpdate(Long id) {
+        var pet = get(id);
+        return petMapper.toUpdateRequest(pet);
+    }
+
+    public Shelter getShelterForPet(Long id) {
+        var pet = get(id);
+        return pet.getShelter();
+    }
+
+    public void delete(Long id) {
+        var pet = get(id);
+        petRepository.delete(pet);
+    }
+
+    public void update(Long id, PetUpdateRequest dto) {
+        var pet = get(id);
+        pet.setName(dto.name());
+        if (!isNull(dto.photo()))
+            pet.setPhoto(dto.photo());
+
+        pet.setSpecies(dto.species());
+        pet.setSex(PetSex.valueOf(dto.sex()));
+        pet.setAge(dto.age());
+        pet.setDescription(dto.description());
+        petRepository.save(pet);
     }
 }
