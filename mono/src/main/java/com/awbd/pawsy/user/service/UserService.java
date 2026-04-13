@@ -1,5 +1,6 @@
 package com.awbd.pawsy.user.service;
 
+import com.awbd.pawsy.user.dto.UserUpdateRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.awbd.pawsy.user.repository.RoleRepository;
 import com.awbd.pawsy.user.repository.UserRepository;
@@ -42,5 +43,17 @@ public class UserService {
 
     public User getByUsername(final String username) {
         return userRepository.findUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User `%s` was not found.".formatted(username)));
+    }
+
+    public UserUpdateRequest getProfileForUpdate(User user) {
+        return userMapper.toUpdateRequest(user);
+    }
+
+    public void update(final String username, UserUpdateRequest dto) {
+        var user = getByUsername(username);
+        user.setFirstName(dto.firstName());
+        user.setLastName(dto.lastName());
+        user.setPhone(dto.phone());
+        userRepository.save(user);
     }
 }

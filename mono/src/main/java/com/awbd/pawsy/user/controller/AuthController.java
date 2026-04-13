@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.stereotype.Controller;
 import com.awbd.pawsy.user.dto.UserCreateRequest;
 import com.awbd.pawsy.user.service.UserService;
-import com.awbd.pawsy.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
 

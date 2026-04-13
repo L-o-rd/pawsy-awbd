@@ -14,4 +14,5 @@ public interface UserMapper {
     @Mapping(target = "credentialsNonExpired", ignore = true)
     @Mapping(target = "enabled", ignore = true)
     User toUser(UserCreateRequest dto);
+    UserUpdateRequest toUpdateRequest(User user);
 }
