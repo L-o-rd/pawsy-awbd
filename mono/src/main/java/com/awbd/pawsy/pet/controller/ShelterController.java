@@ -4,7 +4,6 @@ import com.awbd.pawsy.pet.service.PetService;
 import com.awbd.pawsy.pet.service.ShelterService;
 import com.awbd.pawsy.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +22,6 @@ public class ShelterController {
     private final PetService petService;
 
     @GetMapping("/pets")
-    @PreAuthorize("hasRole('MANAGER')")
     public String myPets(@RequestParam(defaultValue = "0") Integer page,
                          @RequestParam(defaultValue = "6") Integer size,
                          Model model) {

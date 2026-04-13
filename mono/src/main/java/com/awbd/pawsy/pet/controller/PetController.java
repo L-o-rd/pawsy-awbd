@@ -1,7 +1,6 @@
 package com.awbd.pawsy.pet.controller;
 
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.validation.BindingResult;
@@ -82,7 +81,6 @@ public class PetController {
     }
 
     @GetMapping("/{id}/edit")
-    @PreAuthorize("hasRole('MANAGER')")
     public String editPage(@PathVariable Long id, Model model) {
         var user = userService.getByUsername(requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
         var shelter = petService.getShelterForPet(id);
@@ -96,7 +94,6 @@ public class PetController {
     }
 
     @PostMapping("/{id}/edit")
-    @PreAuthorize("hasRole('MANAGER')")
     public String updatePet(@PathVariable Long id,
                             @Valid @ModelAttribute("pet") PetUpdateRequest dto,
                             BindingResult result,
@@ -119,7 +116,6 @@ public class PetController {
     }
 
     @PostMapping("/{id}/delete")
-    @PreAuthorize("hasRole('MANAGER')")
     public String deletePet(@PathVariable Long id, RedirectAttributes redirect) {
         petService.delete(id);
         redirect.addFlashAttribute("successMessage", "Pet deleted successfully!");
