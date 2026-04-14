@@ -1,10 +1,13 @@
 package com.awbd.pawsy.pet.service;
 
+import com.awbd.pawsy.pet.dto.ShelterCreateRequest;
 import com.awbd.pawsy.pet.dto.ShelterMapper;
 import com.awbd.pawsy.pet.dto.ShelterSummary;
 import com.awbd.pawsy.pet.repository.ShelterRepository;
 import com.awbd.pawsy.pet.specification.ShelterSpecifications;
+import com.awbd.pawsy.user.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +26,7 @@ import static java.util.Objects.isNull;
 public class ShelterService {
     private final ShelterRepository shelterRepository;
     private final ShelterMapper shelterMapper;
+    private final UserService userService;
 
     public List<Shelter> all() {
         return shelterRepository.findAll();
@@ -59,5 +63,17 @@ public class ShelterService {
         );
 
         return shelterRepository.findAll(spec, finalPageable).map(shelterMapper::toSummary);
+    }
+
+    @Transactional
+    public void create(ShelterCreateRequest dto, User user) {
+        var shelter = new Shelter();
+        shelter.setName(dto.name());
+        shelter.setLocation(dto.location());
+        shelter.setEmail(dto.email());
+        shelter.setPhone(dto.phone());
+        shelter.setManager(user);
+        shelterRepository.save(shelter);
+        userService.makeManager(user);
     }
 }
