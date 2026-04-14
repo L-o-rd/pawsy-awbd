@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title>Register Your Shelter • Pawsy</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-body-tertiary">
+
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<section class="py-5 bg-danger-subtle">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-7">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body p-5">
+
+                        <!-- HEADER -->
+                        <div class="text-center mb-4">
+
+                            <h3 class="fw-bold text-danger-emphasis">
+                                Register Your Shelter
+                            </h3>
+
+                            <p class="text-muted">
+                                Help pets find loving homes by joining Pawsy
+                            </p>
+
+                        </div>
+
+                        <div th:if="${successMessage}" class="alert alert-success text-center" th:text="${successMessage}"></div>
+                        <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
+
+                        <!-- FORM -->
+                        <form th:action="@{/shelters/apply}"
+                              method="post"
+                              th:object="${shelter}">
+
+                            <!-- NAME -->
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Shelter Name</label>
+                                <input type="text"
+                                       id="name"
+                                       name="name"
+                                       th:field="*{name}"
+                                       class="form-control rounded-3">
+                                <div class="text-danger small" th:errors="*{name}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location</label>
+                                <input id="location" name="location" type="text"
+                                       th:field="*{location}"
+                                       class="form-control rounded-3">
+                                <div class="text-danger small" th:errors="*{location}"></div>
+                            </div>
+
+                            <!-- EMAIL -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Contact Email</label>
+                                <input id="email" type="email"
+                                       th:field="*{email}"
+                                       class="form-control rounded-3">
+                                <div class="text-danger small" th:errors="*{email}"></div>
+                            </div>
+
+                            <!-- PHONE -->
+                            <div class="mb-4">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input id="phone" type="text"
+                                       th:field="*{phone}"
+                                       class="form-control rounded-3">
+                                <div class="text-danger small" th:errors="*{phone}"></div>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-danger w-100 py-3 pawsy-btn d-flex align-items-center justify-content-center gap-2">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24">
+                                    <path d="M12 5v14M5 12h14"/>
+                                </svg>
+
+                                Register Shelter
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                <!-- INFO -->
+                <p class="text-muted small text-center mt-3">
+                    Once registered, you will be able to add and manage pets.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+    $(function(){
+
+        $(".pawsy-btn").hover(
+            function(){ $(this).stop().animate({marginTop:"-3px"},120); },
+            function(){ $(this).stop().animate({marginTop:"0px"},120); }
+        );
+
+    });
+</script>
+
+</body>
+</html>
