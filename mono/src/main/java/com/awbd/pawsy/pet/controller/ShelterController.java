@@ -1,15 +1,20 @@
 package com.awbd.pawsy.pet.controller;
 
+import com.awbd.pawsy.pet.dto.ShelterCreateRequest;
 import com.awbd.pawsy.pet.service.PetService;
 import com.awbd.pawsy.pet.service.ShelterService;
+import com.awbd.pawsy.security.PawsyUserDetailsService;
 import com.awbd.pawsy.user.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,6 +22,7 @@ import static java.util.Objects.requireNonNull;
 @RequiredArgsConstructor
 @RequestMapping("/shelters")
 public class ShelterController {
+    private final PawsyUserDetailsService pawsyUserDetailsService;
     private final ShelterService shelterService;
     private final UserService userService;
     private final PetService petService;
@@ -46,5 +52,42 @@ public class ShelterController {
         model.addAttribute("location", location);
         model.addAttribute("sort", sort);
         return "shelters/list";
+    }
+
+    @GetMapping("/apply")
+    public String showApplyForm(Model model) {
+        model.addAttribute("shelter", new ShelterCreateRequest(null, null, null, null));
+        return "shelters/apply";
+    }
+
+    @PostMapping("/apply")
+    public String apply(@Valid @ModelAttribute("shelter") ShelterCreateRequest dto,
+                        BindingResult result,
+                        RedirectAttributes redirect) {
+
+        if (result.hasErrors()) {
+            return "shelters/apply";
+        }
+
+        try {
+            var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+            var user = userService.getByUsername(username);
+
+            try {
+                var shelter = shelterService.getByManager(user);
+                redirect.addFlashAttribute("errorMessage", "You are already a manager for `%s`.".formatted(shelter.getName()));
+                return "redirect:/shelters/apply";
+            } catch (EntityNotFoundException ignored) {}
+
+            shelterService.create(dto, user);
+            var updated = pawsyUserDetailsService.loadUserByUsername(username);
+            var uauth = new UsernamePasswordAuthenticationToken(updated, updated.getPassword(), updated.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(uauth);
+            redirect.addFlashAttribute("successMessage", "Your shelter has been registered successfully!");
+            return "redirect:/shelters/pets";
+        } catch (Exception e) {
+            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/shelters/apply";
+        }
     }
 }
