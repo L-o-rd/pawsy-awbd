@@ -1,5 +1,7 @@
 package com.awbd.pawsy.pet.controller;
 
+import com.awbd.pawsy.adoption.dto.AdoptionCreateRequest;
+import com.awbd.pawsy.adoption.service.AdoptionService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -22,6 +24,7 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 @RequestMapping("/pets")
 public class PetController {
+    private final AdoptionService adoptionService;
     private final ShelterService shelterService;
     private final UserService userService;
     private final PetService petService;
@@ -120,5 +123,28 @@ public class PetController {
         petService.delete(id);
         redirect.addFlashAttribute("successMessage", "Pet deleted successfully!");
         return "redirect:/shelters/pets";
+    }
+
+    @GetMapping("/{id}/adopt")
+    public String showAdoptionForm(@PathVariable Long id, Model model) {
+        var pet = petService.summary(petService.get(id));
+        model.addAttribute("adoption", new AdoptionCreateRequest(null));
+        model.addAttribute("pet", pet);
+        return "adoptions/create";
+    }
+
+    @PostMapping("/{id}/adopt")
+    public String submitAdoption(@PathVariable Long id,
+                                 @ModelAttribute("adoption") AdoptionCreateRequest dto,
+                                 RedirectAttributes redirect) {
+        var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        try {
+            adoptionService.create(id, username, dto);
+            redirect.addFlashAttribute("successMessage", "Your adoption request has been sent!");
+            return "redirect:/pets/" + id;
+        } catch (Exception e) {
+            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/pets/" + id;
+        }
     }
 }
