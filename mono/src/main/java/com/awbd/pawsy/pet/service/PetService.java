@@ -119,4 +119,10 @@ public class PetService {
         pet.setDescription(dto.description());
         petRepository.save(pet);
     }
+
+    public void markAdopted(Long id) {
+        var pet = get(id);
+        pet.setStatus(PetStatus.Adopted);
+        petRepository.save(pet);
+    }
 }

@@ -24,9 +24,8 @@ public class SecurityConfig {
                 .requestMatchers("/", "/login", "/register",
                         "/css/**", "/images/**", "/webjars/**").permitAll()
                 .requestMatchers("/pets/create/**").hasRole("MANAGER")
-                .requestMatchers("/shelters/pets/**").hasRole("MANAGER")
-                .requestMatchers("/pets/*/edit").hasRole("MANAGER")
-                .requestMatchers("/pets/*/delete").hasRole("MANAGER")
+                .requestMatchers("/shelters/pets/**", "/shelters/adoptions/**").hasRole("MANAGER")
+                .requestMatchers("/pets/*/edit", "/pets/*/delete").hasRole("MANAGER")
                 .requestMatchers("/pets", "/shelters", "/about").permitAll()
                 .anyRequest().authenticated())
                 .userDetailsService(pawsyUserDetailsService)
