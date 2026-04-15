@@ -76,4 +76,8 @@ public class ShelterService {
         shelterRepository.save(shelter);
         userService.makeManager(user);
     }
+
+    public ShelterSummary summary(Long id) {
+        return shelterMapper.toSummary(get(id));
+    }
 }

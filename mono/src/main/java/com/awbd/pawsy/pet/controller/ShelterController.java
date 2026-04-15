@@ -90,4 +90,18 @@ public class ShelterController {
             return "redirect:/shelters/apply";
         }
     }
+
+    @GetMapping("/{id}")
+    public String shelterDetails(@PathVariable Long id,
+                                 @RequestParam(defaultValue = "0") Integer page,
+                                 @RequestParam(defaultValue = "6") Integer size,
+                                 Model model) {
+
+        var shelter = shelterService.summary(id);
+        var petsPage = petService.getPetsForShelter(shelterService.get(id), page, size);
+
+        model.addAttribute("petsPage", petsPage);
+        model.addAttribute("shelter", shelter);
+        return "shelters/profile";
+    }
 }
