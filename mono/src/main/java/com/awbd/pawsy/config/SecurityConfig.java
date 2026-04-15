@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .requestMatchers("/shelters/pets/**").hasRole("MANAGER")
                 .requestMatchers("/pets/*/edit").hasRole("MANAGER")
                 .requestMatchers("/pets/*/delete").hasRole("MANAGER")
+                .requestMatchers("/pets", "/shelters", "/about").permitAll()
                 .anyRequest().authenticated())
                 .userDetailsService(pawsyUserDetailsService)
                 .formLogin(login -> login
