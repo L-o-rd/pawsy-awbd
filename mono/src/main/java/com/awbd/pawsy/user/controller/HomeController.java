@@ -25,6 +25,11 @@ public class HomeController {
         return "home";
     }
 
+    @GetMapping("/about")
+    public String about() {
+        return "about";
+    }
+
     @GetMapping("/profile")
     public String myProfile(Model model) {
         var auth = requireNonNull(SecurityContextHolder.getContext().getAuthentication());
