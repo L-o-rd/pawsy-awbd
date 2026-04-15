@@ -1,5 +1,6 @@
 package com.awbd.pawsy.pet.controller;
 
+import com.awbd.pawsy.adoption.service.AdoptionService;
 import com.awbd.pawsy.pet.dto.ShelterCreateRequest;
 import com.awbd.pawsy.pet.service.PetService;
 import com.awbd.pawsy.pet.service.ShelterService;
@@ -8,6 +9,7 @@ import com.awbd.pawsy.user.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -23,6 +25,7 @@ import static java.util.Objects.requireNonNull;
 @RequestMapping("/shelters")
 public class ShelterController {
     private final PawsyUserDetailsService pawsyUserDetailsService;
+    private final AdoptionService adoptionService;
     private final ShelterService shelterService;
     private final UserService userService;
     private final PetService petService;
@@ -103,5 +106,35 @@ public class ShelterController {
         model.addAttribute("petsPage", petsPage);
         model.addAttribute("shelter", shelter);
         return "shelters/profile";
+    }
+
+    @GetMapping("/adoptions")
+    public String adoptionRequests(Model model) {
+        var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        var user = userService.getByUsername(username);
+        var shelter = shelterService.getByManager(user);
+        var requests = adoptionService.getRequestsForShelter(shelter.getId());
+        model.addAttribute("requests", requests);
+        return "shelters/adoptions";
+    }
+
+    @PostMapping("/adoptions/{id}/approve")
+    public String approve(@PathVariable Long id, RedirectAttributes at) {
+        try {
+            var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+            var user = userService.getByUsername(username);
+            var adoption = adoptionService.get(id);
+
+            if (!adoption.getPet().getShelter().getManager().getId().equals(user.getId())) {
+                throw new AccessDeniedException("You are not the manager!");
+            }
+
+            adoptionService.approve(id);
+            at.addFlashAttribute("successMessage", "You have approved a request.");
+            return "redirect:/shelters/adoptions";
+        } catch (Exception e) {
+            at.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/shelters/adoptions";
+        }
     }
 }

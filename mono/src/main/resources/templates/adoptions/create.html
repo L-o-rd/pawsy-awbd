@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title>Adopt • Pawsy</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-body-tertiary">
+
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<section class="py-5 bg-danger-subtle">
+
+    <div class="container">
+
+        <div class="row g-5 align-items-center">
+
+            <!-- PET PREVIEW -->
+            <div class="col-lg-5">
+
+                <div class="card border-0 shadow rounded-4 overflow-hidden">
+
+                    <img th:src="@{${pet.photo}}"
+                         style="height:300px;object-fit:cover" alt="Pet Photo">
+
+                    <div class="card-body text-center">
+
+                        <h5 class="fw-semibold" th:text="${pet.name}"></h5>
+
+                        <p class="text-muted small">
+                            <span th:text="${pet.species}"></span>
+                            •
+                            <span th:text="${pet.age}"></span> years
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FORM -->
+            <div class="col-lg-7">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body p-5">
+
+                        <h3 class="fw-bold text-danger-emphasis mb-3">
+                            Adoption Request
+                        </h3>
+
+                        <p class="text-muted mb-4">
+                            Tell the shelter why you'd be a great match for this pet.
+                        </p>
+
+                        <form th:action="@{/pets/{id}/adopt(id=${pet.id})}"
+                              method="post"
+                              th:object="${adoption}">
+
+                            <!-- MESSAGE -->
+                            <div class="mb-4">
+                                <label for="message" class="form-label">Message (10 - 100)</label>
+                                <textarea id="message" th:field="*{message}"
+                                          class="form-control rounded-3"
+                                          rows="4"
+                                          placeholder="Write a short message..."></textarea>
+                            </div>
+
+                            <!-- CTA -->
+                            <button type="submit"
+                                    class="btn btn-danger w-100 py-3 pawsy-btn d-flex align-items-center justify-content-center gap-2">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24">
+                                    <path d="M12 21s-7-4.6-9.5-7.4C.6 11.7.6 9 2.4 7.3c1.7-1.6 4.4-1.5 6 .3L12 11l3.6-3.4c1.6-1.8 4.3-1.9 6-.3 1.8 1.7 1.8 4.4-.1 6.3C19 16.4 12 21 12 21z"/>
+                                </svg>
+
+                                Send Adoption Request
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+    $(function(){
+
+        $(".pawsy-btn").hover(
+            function(){ $(this).stop().animate({marginTop:"-3px"},120); },
+            function(){ $(this).stop().animate({marginTop:"0px"},120); }
+        );
+
+    });
+</script>
+
+</body>
+</html>
