@@ -70,4 +70,16 @@ public class ReviewService {
                 .orElseThrow(() -> new EntityNotFoundException("Review for adopter %d and shelter %d was not found!".formatted(adopterId, shelterId)));
         reviewRepository.delete(review);
     }
+
+    public List<ReviewSummary> getRecent() {
+        return reviewRepository.findTop5ByOrderByCreatedAtDesc()
+                .stream()
+                .map(reviewMapper::toSummary)
+                .toList();
+    }
+
+    public void deleteById(Long id) {
+        if (!reviewRepository.existsById(id)) return;
+        reviewRepository.deleteById(id);
+    }
 }

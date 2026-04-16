@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security" lang="en">
 
 <head>
     <title th:text="${shelter.name} + ' • Pawsy'">Shelter</title>
@@ -304,12 +304,32 @@
                         <div class="fw-semibold"
                              th:text="${r.username}"></div>
 
-                        <small class="text-muted"
-                               th:text="${#temporals.format(r.createdAt, 'dd MMM yyyy')}"></small>
+                        <div class="d-flex align-items-center gap-2">
 
-                        <div th:if="${r.editedAt != null}">
                             <small class="text-muted"
-                                   th:text="${#temporals.format(r.editedAt, 'dd MMM yyyy hh:mm')}"></small>
+                                   th:text="${#temporals.format(r.createdAt,'dd MMM yyyy')}"></small>
+
+                            <div th:if="${r.editedAt != null}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="#6c757d" viewBox="0 0 24 24">
+                                    <path d="M3 17.25V21h3.75L19.81 7.94l-3.75-3.75L3 17.25zm17.71-10.04a1.003 1.003 0 0 0 0-1.42l-2.5-2.5a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.99-1.66z"/>
+                                </svg>
+
+                                <small class="text-muted"
+                                       th:text="${#temporals.format(r.editedAt, 'dd MMM yyyy hh:mm')}"></small>
+                            </div>
+
+                            <!-- ADMIN DELETE -->
+                            <form sec:authorize="hasRole('ADMIN')"
+                                  th:action="@{/admin/reviews/{id}/delete(id=${r.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Delete this review?');">
+
+                                <button class="btn btn-sm btn-outline-secondary pawsy-btn">
+                                    Delete
+                                </button>
+
+                            </form>
+
                         </div>
 
                     </div>

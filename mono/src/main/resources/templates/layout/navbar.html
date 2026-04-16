@@ -172,6 +172,12 @@
 
                         </li>
 
+                        <li sec:authorize="hasRole('ADMIN')">
+                            <a class="dropdown-item small text-muted" th:href="@{/admin/dashboard}">
+                                Dashboard
+                            </a>
+                        </li>
+
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form th:action="@{/logout}" method="post">
