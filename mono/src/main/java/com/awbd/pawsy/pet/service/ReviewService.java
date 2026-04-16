@@ -63,4 +63,11 @@ public class ReviewService {
         review.setEditedAt(LocalDateTime.now());
         reviewRepository.save(review);
     }
+
+    public void delete(Long adopterId, Long shelterId) {
+        var review = reviewRepository
+                .findByAdopterIdAndShelterId(adopterId, shelterId)
+                .orElseThrow(() -> new EntityNotFoundException("Review for adopter %d and shelter %d was not found!".formatted(adopterId, shelterId)));
+        reviewRepository.delete(review);
+    }
 }

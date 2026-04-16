@@ -120,6 +120,14 @@ public class ShelterController {
         return "shelters/profile";
     }
 
+    @PostMapping("/{id}/review/delete")
+    public String deleteReview(@PathVariable Long id) {
+        var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        var user = userService.getByUsername(username);
+        reviewService.delete(user.getId(), id);
+        return "redirect:/shelters/" + id;
+    }
+
     @PostMapping("/{id}/review")
     public String submitReview(@PathVariable Long id,
                                @Valid @ModelAttribute("reviewForm") ReviewCreateRequest dto,
