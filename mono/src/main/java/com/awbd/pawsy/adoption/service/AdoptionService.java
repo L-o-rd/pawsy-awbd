@@ -20,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdoptionService {
     private final AdoptionRepository adoptionRepository;
+    private final AppointmentService appointmentService;
     private final AdoptionMapper adoptionMapper;
     private final UserService userService;
     private final PetService petService;
@@ -65,6 +66,7 @@ public class AdoptionService {
         adoption.setApprovalDate(LocalDateTime.now());
         petService.markAdopted(adoption.getPet().getId());
         adoptionRepository.save(adoption);
+        appointmentService.cancelAllForPet(adoption.getPet().getId());
 
         var others = adoptionRepository.findByPetIdAndStatus(adoption.getPet().getId(), AdoptionStatus.Pending);
         others.stream().map(Adoption::getId).forEach(this::reject);

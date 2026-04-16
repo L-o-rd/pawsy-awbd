@@ -83,4 +83,10 @@ public class AppointmentService {
         appointment.setStatus(AppointmentStatus.Cancelled);
         appointmentRepository.save(appointment);
     }
+
+    public void cancelAllForPet(Long petId) {
+        var appointments = appointmentRepository.findByPetIdAndStatus(petId, AppointmentStatus.Ongoing);
+        for (var a : appointments) a.setStatus(AppointmentStatus.Cancelled);
+        appointmentRepository.saveAll(appointments);
+    }
 }
