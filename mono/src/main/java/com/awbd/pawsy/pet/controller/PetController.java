@@ -1,7 +1,9 @@
 package com.awbd.pawsy.pet.controller;
 
 import com.awbd.pawsy.adoption.dto.AdoptionCreateRequest;
+import com.awbd.pawsy.adoption.dto.AppointmentCreateRequest;
 import com.awbd.pawsy.adoption.service.AdoptionService;
+import com.awbd.pawsy.adoption.service.AppointmentService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -20,10 +22,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
 import jakarta.validation.Valid;
 
+import java.time.LocalDate;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/pets")
 public class PetController {
+    private final AppointmentService appointmentService;
     private final AdoptionService adoptionService;
     private final ShelterService shelterService;
     private final UserService userService;
@@ -144,6 +149,43 @@ public class PetController {
             return "redirect:/pets/" + id;
         } catch (Exception e) {
             redirect.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/pets/" + id;
+        }
+    }
+
+    @GetMapping("/{id}/appointments/new")
+    public String appointmentForm(@PathVariable Long id, Model model) {
+        var pet = petService.summary(petService.get(id));
+        var bookedDates = appointmentService.getBookedDates(id);
+
+        model.addAttribute("pet", pet);
+        model.addAttribute("appointment", new AppointmentCreateRequest(null));
+        model.addAttribute("bookedDates", bookedDates
+                .stream().map(LocalDate::toString).toList());
+        return "appointments/create";
+    }
+
+    @PostMapping("/{id}/appointments")
+    public String submitAppointment(@PathVariable Long id,
+                                    @Valid @ModelAttribute("appointment") AppointmentCreateRequest dto,
+                                    BindingResult result,
+                                    RedirectAttributes redirect,
+                                    Model model) {
+        if (result.hasErrors()) {
+            var pet = petService.summary(petService.get(id));
+            model.addAttribute("pet", pet);
+            model.addAttribute("bookedDates", appointmentService.getBookedDates(id)
+                    .stream().map(LocalDate::toString).toList());
+            return "appointments/create";
+        }
+
+        try {
+            var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+            appointmentService.create(username, id, dto);
+            redirect.addFlashAttribute("successMessage", "You scheduled an appointment!");
+            return "redirect:/pets/" + id;
+        } catch (Exception e) {
+            redirect.addFlashAttribute("errorMessage", "Failed to schedule your appointment.");
             return "redirect:/pets/" + id;
         }
     }

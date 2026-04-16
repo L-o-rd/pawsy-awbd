@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title>Schedule Visit • Pawsy</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-body-tertiary">
+
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<section class="py-5 bg-danger-subtle">
+
+    <div class="container">
+
+        <div class="row g-5 align-items-center">
+
+            <!-- PET -->
+            <div class="col-lg-5">
+
+                <div class="card border-0 shadow rounded-4 overflow-hidden">
+
+                    <img th:src="@{${pet.photo}}"
+                         style="height:300px;object-fit:cover" alt="Pet Photo">
+
+                    <div class="card-body text-center">
+
+                        <h5 class="fw-semibold" th:text="${pet.name}"></h5>
+
+                        <p class="text-muted small">
+                            <span th:text="${pet.species}"></span>
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FORM -->
+            <div class="col-lg-7">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body p-5">
+
+                        <h3 class="fw-bold text-danger-emphasis mb-3">
+                            Schedule a Visit
+                        </h3>
+
+                        <p class="text-muted mb-4">
+                            Choose a date to meet this pet in person.
+                        </p>
+
+                        <form th:action="@{/pets/{id}/appointments(id=${pet.id})}"
+                              method="post"
+                              th:object="${appointment}">
+
+                            <!-- DATE -->
+                            <div class="mb-4">
+                                <label for="appointmentDate" class="form-label">Select Date</label>
+
+                                <input type="date"
+                                       class="form-control"
+                                       th:field="*{appointmentDate}"
+                                       id="appointmentDate">
+
+                                <div class="text-danger small" th:errors="*{appointmentDate}"></div>
+                            </div>
+
+                            <button class="btn btn-danger w-100 py-3 pawsy-btn">
+                                Confirm
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script th:inline="javascript">
+    let bookedDates = [[${bookedDates}]];
+</script>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+    $(function(){
+
+        const input = document.getElementById("appointmentDate");
+        const today = new Date().toISOString().split('T')[0];
+        input.setAttribute("min", today);
+
+        const bookedSet = new Set(bookedDates);
+        input.addEventListener("input", function(){
+            if (bookedSet.has(this.value)) {
+                alert("This date is already booked");
+                this.value = "";
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>
