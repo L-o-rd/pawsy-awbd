@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title>Admin Dashboard • Pawsy</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-body-tertiary">
+
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<section class="py-5 bg-danger-subtle">
+
+    <div class="container">
+
+        <h3 class="fw-bold text-danger-emphasis mb-4">
+            Admin Dashboard
+        </h3>
+
+        <div class="row g-4 mb-4">
+
+            <!-- PETS -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+                    <div class="fw-semibold text-muted small">Total Pets</div>
+                    <h3 class="fw-bold text-danger-emphasis"
+                        th:text="${stats.totalPets}"></h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+                    <div class="fw-semibold text-muted small">Available</div>
+                    <h3 class="fw-bold text-success"
+                        th:text="${stats.availablePets}"></h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+                    <div class="fw-semibold text-muted small">Adopted</div>
+                    <h3 class="fw-bold text-secondary"
+                        th:text="${stats.adoptedPets}"></h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+                    <div class="fw-semibold text-muted small">Users</div>
+                    <h3 class="fw-bold text-danger-emphasis"
+                        th:text="${stats.totalUsers}"></h3>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+                    <div class="fw-semibold text-muted small">Shelters</div>
+                    <h3 class="fw-bold text-danger-emphasis"
+                        th:text="${stats.totalShelters}"></h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+                    <div class="fw-semibold text-muted small">Adoptions</div>
+                    <h3 class="fw-bold text-danger-emphasis"
+                        th:text="${stats.totalAdoptions}"></h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+                    <div class="fw-semibold text-muted small">Pending</div>
+                    <h3 class="fw-bold text-warning"
+                        th:text="${stats.pendingAdoptions}"></h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+                    <div class="fw-semibold text-muted small">Appointments</div>
+                    <h3 class="fw-bold text-danger-emphasis"
+                        th:text="${stats.totalAppointments}"></h3>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+
+            <h5 class="fw-semibold text-danger-emphasis mb-3">
+                Platform Insights
+            </h5>
+
+            <ul class="list-unstyled mb-0 small text-muted">
+
+                <li>
+                    • <span th:text="${stats.availablePets}"></span> pets are still looking for a home
+                </li>
+
+                <li>
+                    • <span th:text="${stats.pendingAdoptions}"></span> adoption requests need review
+                </li>
+
+                <li>
+                    • <span th:text="${stats.ongoingAppointments}"></span> upcoming visits scheduled
+                </li>
+
+                <li>
+                    • <span th:text="${stats.totalShelters}"></span> shelters are active on the platform
+                </li>
+
+            </ul>
+
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4 mt-4">
+
+            <h5 class="fw-semibold text-danger-emphasis mb-3">
+                Recent Reviews
+            </h5>
+
+            <div th:if="${#lists.isEmpty(recentReviews)}" class="text-muted small">
+                No reviews yet.
+            </div>
+
+            <div th:if="${!#lists.isEmpty(recentReviews)}">
+
+                <div th:each="r : ${recentReviews}"
+                     class="d-flex justify-content-between align-items-start border-bottom py-2">
+
+                    <div>
+
+                        <div class="fw-semibold small"
+                             th:text="${r.username}"></div>
+
+                        <div class="small text-muted"
+                             th:text="${r.comment}"></div>
+
+                    </div>
+
+                    <form th:action="@{/admin/reviews/{id}/delete(id=${r.id})}"
+                          method="post"
+                          onsubmit="return confirm('Delete this review?');">
+
+                        <button class="btn btn-sm btn-outline-secondary pawsy-btn">
+                            Delete
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+</html>

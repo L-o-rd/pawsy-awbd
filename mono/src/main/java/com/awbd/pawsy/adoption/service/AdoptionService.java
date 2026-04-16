@@ -79,4 +79,12 @@ public class AdoptionService {
         adoption.setApprovalDate(LocalDateTime.now());
         adoptionRepository.save(adoption);
     }
+
+    public Long count() {
+        return adoptionRepository.count();
+    }
+
+    public Long countByStatus(AdoptionStatus status) {
+        return adoptionRepository.countByStatus(status);
+    }
 }

@@ -89,4 +89,12 @@ public class AppointmentService {
         for (var a : appointments) a.setStatus(AppointmentStatus.Cancelled);
         appointmentRepository.saveAll(appointments);
     }
+
+    public Long count() {
+        return appointmentRepository.count();
+    }
+
+    public Long countByStatus(AppointmentStatus status) {
+        return appointmentRepository.countByStatus(status);
+    }
 }

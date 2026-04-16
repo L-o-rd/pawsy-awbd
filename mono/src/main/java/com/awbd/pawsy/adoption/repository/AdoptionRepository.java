@@ -12,4 +12,5 @@ public interface AdoptionRepository extends JpaRepository<Adoption, Long> {
     boolean existsByAdopterIdAndPetId(Long adopterId, Long petId);
     List<Adoption> findByPetShelterId(Long shelterId);
     List<Adoption> findByAdopterId(Long adopterId);
+    Long countByStatus(AdoptionStatus status);
 }

@@ -63,4 +63,8 @@ public class UserService {
         user.setRoles(roles);
         userRepository.save(user);
     }
+
+    public Long count() {
+        return userRepository.count();
+    }
 }

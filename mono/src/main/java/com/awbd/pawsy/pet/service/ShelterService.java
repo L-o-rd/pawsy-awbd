@@ -80,4 +80,8 @@ public class ShelterService {
     public ShelterSummary summary(Long id) {
         return shelterMapper.toSummary(get(id));
     }
+
+    public Long count() {
+        return shelterRepository.count();
+    }
 }

@@ -125,4 +125,12 @@ public class PetService {
         pet.setStatus(PetStatus.Adopted);
         petRepository.save(pet);
     }
+
+    public Long count() {
+        return petRepository.count();
+    }
+
+    public Long countByStatus(PetStatus status) {
+        return petRepository.countByStatus(status);
+    }
 }

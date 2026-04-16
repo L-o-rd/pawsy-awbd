@@ -12,5 +12,6 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Optional<Review> findByAdopterIdAndShelterId(Long adopterId, Long shelterId);
     Page<Review> findByShelterId(Long shelterId, Pageable pageable);
+    List<Review> findTop5ByOrderByCreatedAtDesc();
     List<Review> findByShelterId(Long shelterId);
 }
