@@ -14,6 +14,9 @@
 
     <div class="container">
 
+        <div th:if="${successMessage}" class="alert alert-success text-center" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
+
         <div class="row g-5 align-items-center">
 
             <!-- ICON / VISUAL -->
@@ -71,6 +74,78 @@
 
                             <div class="fw-semibold" th:text="${shelter.manager}"></div>
                             <div class="small text-muted">Manager</div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="mt-4">
+
+                <div class="card border-0 bg-white shadow-sm rounded-4 p-3">
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                        <!-- LEFT TEXT -->
+                        <div class="small text-muted">
+
+                        <span th:if="${userReview == null}">
+                            Share your experience with this shelter
+                        </span>
+
+                        <span th:if="${userReview != null}">
+                            You rated this shelter
+                        </span>
+
+                        <span th:if="${userReview != null}" class="ms-2">
+
+                            <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                <svg width="14" height="14"
+                                     th:attr="fill=${i <= userReview.rating} ? '#e83e8c' : '#ddd'"
+                                     viewBox="0 0 24 24">
+                                    <path d="M12 17.3l6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7l-7.1.6 5.4 4.7-1.6 7z"/>
+                                </svg>
+                            </span>
+
+                        </span>
+
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="d-flex gap-2">
+
+                            <!-- CREATE -->
+                            <button th:if="${userReview == null}"
+                                    class="btn btn-danger btn-sm pawsy-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#reviewModal">
+
+                                Leave Review
+
+                            </button>
+
+                            <!-- EDIT -->
+                            <button th:if="${userReview != null}"
+                                    class="btn btn-outline-danger btn-sm pawsy-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#reviewModal">
+
+                                Edit
+                            </button>
+
+                            <!-- DELETE -->
+                            <form th:if="${userReview != null}"
+                                  th:action="@{/shelters/{id}/review/delete(id=${shelter.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Delete your review?');">
+
+                                <button class="btn btn-outline-secondary btn-sm pawsy-btn">
+                                    Delete
+                                </button>
+                            </form>
 
                         </div>
 
@@ -180,6 +255,193 @@
 
 </section>
 
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <h4 class="fw-semibold text-danger-emphasis">
+                What people say
+            </h4>
+
+            <!-- SORT -->
+            <form method="get"
+                  th:action="@{/shelters/{id}(id=${shelter.id})}">
+
+                <label>
+                    <select name="sort"
+                            class="form-select form-select-sm"
+                            onchange="this.form.submit()">
+
+                        <option value="" selected disabled>Choose...</option>
+                        <option value="createdAt">Newest</option>
+                        <option value="rating">Highest Rating</option>
+
+                    </select>
+                </label>
+
+            </form>
+
+        </div>
+
+        <!-- EMPTY -->
+        <div th:if="${reviewsPage.totalElements == 0}"
+             class="text-muted">
+            No reviews yet.
+        </div>
+
+        <!-- LIST -->
+        <div th:if="${reviewsPage.totalElements > 0}">
+
+            <div th:each="r : ${reviewsPage.content}"
+                 class="mb-3">
+
+                <div class="card border-0 shadow-sm rounded-4 p-3">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div class="fw-semibold"
+                             th:text="${r.username}"></div>
+
+                        <small class="text-muted"
+                               th:text="${#temporals.format(r.createdAt, 'dd MMM yyyy')}"></small>
+
+                        <div th:if="${r.editedAt != null}">
+                            <small class="text-muted"
+                                   th:text="${#temporals.format(r.editedAt, 'dd MMM yyyy hh:mm')}"></small>
+                        </div>
+
+                    </div>
+
+                    <!-- STARS -->
+                    <div class="mb-2 mt-1">
+                        <span th:each="i : ${#numbers.sequence(1, 5)}">
+                            <svg width="16" height="16"
+                                 th:attr="fill=${i <= r.rating} ? '#e83e8c' : '#ddd'"
+                                 viewBox="0 0 24 24">
+                                <path d="M12 17.3l6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7l-7.1.6 5.4 4.7-1.6 7z"/>
+                            </svg>
+                        </span>
+                    </div>
+
+                    <p class="text-muted small mb-0"
+                       th:text="${r.comment}">
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- PAGINATION -->
+        <ul class="pagination justify-content-center mt-4"
+            th:if="${reviewsPage.totalPages > 0}">
+
+            <li class="page-item"
+                th:classappend="${reviewsPage.first}? 'disabled'">
+
+                <a class="page-link"
+                   th:href="@{/shelters/{id}(id=${shelter.id}, page=${reviewsPage.number - 1})}">
+                    Previous
+                </a>
+
+            </li>
+
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(0, reviewsPage.totalPages - 1)}"
+                th:classappend="${i == reviewsPage.number}? 'active'">
+
+                <a class="page-link"
+                   th:text="${i+1}"
+                   th:href="@{/shelters/{id}(id=${shelter.id}, page=${i})}">
+                </a>
+
+            </li>
+
+            <li class="page-item"
+                th:classappend="${reviewsPage.last}? 'disabled'">
+
+                <a class="page-link"
+                   th:href="@{/shelters/{id}(id=${shelter.id}, page=${reviewsPage.number+1})}">
+                    Next
+                </a>
+
+            </li>
+
+        </ul>
+
+    </div>
+
+</section>
+
+<div class="modal fade" id="reviewModal" tabindex="-1">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content rounded-4 border-0">
+
+            <form th:action="@{/shelters/{id}/review(id=${shelter.id})}"
+                  method="post"
+                  th:object="${reviewForm}">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Your Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- RATING -->
+                    <div class="mb-3">
+                        <label class="form-label">Rating</label>
+                        <div id="starRating" class="d-flex gap-1">
+
+                        <span th:each="i : ${#numbers.sequence(1, 5)}"
+                              class="star"
+                              th:attr="data-value=${i}">
+
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="#ddd">
+                                <path d="M12 17.3l6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7l-7.1.6 5.4 4.7-1.6 7z"/>
+                            </svg>
+
+                        </span>
+
+                        </div>
+
+                        <!-- hidden input -->
+                        <input type="hidden" th:field="*{rating}" id="ratingInput">
+
+                        <div class="text-danger small" th:errors="*{rating}"></div>
+                    </div>
+
+                    <!-- MESSAGE -->
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea id="message" class="form-control"
+                                  th:field="*{comment}"
+                                  rows="3"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button class="btn btn-danger pawsy-btn">
+                        Submit Review
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
 <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
 
@@ -195,6 +457,27 @@
             function(){ $(this).stop().animate({marginTop:"-6px"},150); },
             function(){ $(this).stop().animate({marginTop:"0px"},150); }
         );
+
+    });
+
+    $(function(){
+
+        let selectedRating = 0;
+
+        $(".star").on("click", function(){
+
+            selectedRating = $(this).data("value");
+            $("#ratingInput").val(selectedRating);
+
+            $(".star svg").attr("fill", "#ddd");
+
+            $(".star").each(function(){
+                if ($(this).data("value") <= selectedRating) {
+                    $(this).find("svg").attr("fill", "#e83e8c");
+                }
+            });
+
+        });
 
     });
 </script>
