@@ -94,6 +94,25 @@
                     </a>
                 </li>
 
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link fw-medium d-flex align-items-center gap-2" th:href="@{/appointments/my}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" fill="#e83e8c" rx="2"/>
+                            <rect x="6" y="7" width="12" height="1.5" fill="white"/>
+                            <rect x="8" y="5.5" width="1.5" height="3" fill="white"/>
+                            <rect x="14.5" y="5.5" width="1.5" height="3" fill="white"/>
+                            <circle cx="8.5" cy="11" r="0.8" fill="white"/>
+                            <circle cx="11" cy="11" r="0.8" fill="white"/>
+                            <circle cx="13.5" cy="11" r="0.8" fill="white"/>
+                            <circle cx="12" cy="15.5" r="3" fill="none" stroke="white" stroke-width="1.2"/>
+                            <path d="M12 15.5 L12 13.8" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+                            <path d="M12 15.5 L13.5 16.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+
+                        My Appointments
+                    </a>
+                </li>
+
                 <li class="nav-item" sec:authorize="isAuthenticated() && !hasAnyRole('MANAGER', 'ADMIN')">
                     <a class="nav-link fw-medium d-flex align-items-center gap-2" th:href="@{/shelters/apply}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">

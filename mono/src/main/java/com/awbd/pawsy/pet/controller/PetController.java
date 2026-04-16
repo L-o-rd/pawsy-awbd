@@ -184,6 +184,13 @@ public class PetController {
             appointmentService.create(username, id, dto);
             redirect.addFlashAttribute("successMessage", "You scheduled an appointment!");
             return "redirect:/pets/" + id;
+        } catch (IllegalStateException ise) {
+            var pet = petService.summary(petService.get(id));
+            model.addAttribute("pet", pet);
+            model.addAttribute("bookedDates", appointmentService.getBookedDates(id)
+                    .stream().map(LocalDate::toString).toList());
+            model.addAttribute("errorMessage", ise.getMessage());
+            return "appointments/create";
         } catch (Exception e) {
             redirect.addFlashAttribute("errorMessage", "Failed to schedule your appointment.");
             return "redirect:/pets/" + id;
