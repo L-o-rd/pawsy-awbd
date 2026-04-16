@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record AppointmentSummary(
+    Long id,
     PetSummary pet,
     LocalDate appointmentDate,
     LocalDateTime scheduledAtDate,

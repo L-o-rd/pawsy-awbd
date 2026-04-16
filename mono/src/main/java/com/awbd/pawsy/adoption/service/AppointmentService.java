@@ -9,6 +9,7 @@ import com.awbd.pawsy.adoption.repository.AppointmentRepository;
 import com.awbd.pawsy.pet.model.PetStatus;
 import com.awbd.pawsy.pet.service.PetService;
 import com.awbd.pawsy.user.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,7 @@ public class AppointmentService {
     public List<LocalDate> getBookedDates(Long petId) {
         return appointmentRepository.findByPetId(petId)
                 .stream()
+                .filter(a -> a.getStatus().equals(AppointmentStatus.Ongoing) || a.getStatus().equals(AppointmentStatus.Done))
                 .map(Appointment::getAppointmentDate)
                 .toList();
     }
@@ -51,8 +53,12 @@ public class AppointmentService {
             throw new IllegalStateException("You already have an active appointment for this pet!");
         }
 
-        if (appointmentRepository.existsByPetIdAndAppointmentDate(petId, dto.appointmentDate())) {
-            throw new IllegalStateException("Date already booked!");
+        var thatDay = appointmentRepository.findByPetIdAndAppointmentDate(petId, dto.appointmentDate());
+        if (thatDay.isPresent()) {
+            var status = thatDay.get().getStatus();
+            if (status.equals(AppointmentStatus.Ongoing) || status.equals(AppointmentStatus.Done)) {
+                throw new IllegalStateException("Date already booked!");
+            }
         }
 
         var appointment = new Appointment();
@@ -61,6 +67,20 @@ public class AppointmentService {
         appointment.setAppointmentDate(dto.appointmentDate());
         appointment.setScheduledAtDate(LocalDateTime.now());
         appointment.setStatus(AppointmentStatus.Ongoing);
+        appointmentRepository.save(appointment);
+    }
+
+    public Appointment get(Long id) {
+        return appointmentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Appointment %d was not found.".formatted(id)));
+    }
+
+    public void cancel(Long id) {
+        var appointment = get(id);
+        if (appointment.getStatus() != AppointmentStatus.Ongoing) {
+            throw new IllegalStateException("Appointment cannot be cancelled.");
+        }
+
+        appointment.setStatus(AppointmentStatus.Cancelled);
         appointmentRepository.save(appointment);
     }
 }
