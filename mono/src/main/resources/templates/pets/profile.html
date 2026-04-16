@@ -110,6 +110,16 @@
 
                     </a>
 
+                    <a th:href="@{/pets/{id}/appointments/new(id=${pet.id})}"
+                       class="btn btn-outline-danger btn-lg w-100 py-3 mt-3 pawsy-btn d-flex align-items-center justify-content-center gap-2">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#e83e8c" viewBox="0 0 24 24">
+                            <path d="M7 2v2M17 2v2M3 8h18M5 22h14a2 2 0 002-2V8H3v12a2 2 0 002 2z"/>
+                        </svg>
+
+                        Schedule Visit
+                    </a>
+
                 </div>
 
                 <div th:if="${pet.status != 'Available'}" class="alert alert-secondary text-center mt-3">
