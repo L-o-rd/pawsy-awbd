@@ -1,8 +1,10 @@
 package com.awbd.pawsy.pet.controller;
 
 import com.awbd.pawsy.adoption.service.AdoptionService;
+import com.awbd.pawsy.pet.dto.ReviewCreateRequest;
 import com.awbd.pawsy.pet.dto.ShelterCreateRequest;
 import com.awbd.pawsy.pet.service.PetService;
+import com.awbd.pawsy.pet.service.ReviewService;
 import com.awbd.pawsy.pet.service.ShelterService;
 import com.awbd.pawsy.security.PawsyUserDetailsService;
 import com.awbd.pawsy.user.service.UserService;
@@ -27,6 +29,7 @@ public class ShelterController {
     private final PawsyUserDetailsService pawsyUserDetailsService;
     private final AdoptionService adoptionService;
     private final ShelterService shelterService;
+    private final ReviewService reviewService;
     private final UserService userService;
     private final PetService petService;
 
@@ -98,14 +101,53 @@ public class ShelterController {
     public String shelterDetails(@PathVariable Long id,
                                  @RequestParam(defaultValue = "0") Integer page,
                                  @RequestParam(defaultValue = "6") Integer size,
+                                 @RequestParam(defaultValue = "createdAt") String sort,
                                  Model model) {
 
         var shelter = shelterService.summary(id);
         var petsPage = petService.getPetsForShelter(shelterService.get(id), page, size);
+        var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        var user = userService.getByUsername(username);
+        var reviewsPage = reviewService.getPageForShelter(id, page, size, sort);
+        var userReview = reviewService.getUserReview(user.getId(), id);
 
         model.addAttribute("petsPage", petsPage);
         model.addAttribute("shelter", shelter);
+        model.addAttribute("reviewsPage", reviewsPage);
+
+        model.addAttribute("reviewForm", new ReviewCreateRequest(null, null));
+        model.addAttribute("userReview", userReview.orElse(null));
         return "shelters/profile";
+    }
+
+    @PostMapping("/{id}/review")
+    public String submitReview(@PathVariable Long id,
+                               @Valid @ModelAttribute("reviewForm") ReviewCreateRequest dto,
+                               BindingResult result,
+                               RedirectAttributes redirect) {
+
+        var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        var user = userService.getByUsername(username);
+        var userReview = reviewService.getUserReview(user.getId(), id);
+        if (result.hasErrors()) {
+            redirect.addFlashAttribute("errorMessage", "Reviews should be at least 10 characters.");
+            return "redirect:/shelters/" + id;
+        }
+
+        try {
+            if (userReview.isEmpty()) {
+                redirect.addFlashAttribute("successMessage", "Review created!");
+                reviewService.create(username, id, dto);
+            } else {
+                redirect.addFlashAttribute("successMessage", "Review edited!");
+                reviewService.edit(username, id, dto);
+            }
+
+            return "redirect:/shelters/" + id;
+        } catch (Exception e) {
+            redirect.addFlashAttribute("errorMessage", "Failed to submit review.");
+            return "redirect:/shelters/" + id;
+        }
     }
 
     @GetMapping("/adoptions")
@@ -131,6 +173,26 @@ public class ShelterController {
 
             adoptionService.approve(id);
             at.addFlashAttribute("successMessage", "You have approved a request.");
+            return "redirect:/shelters/adoptions";
+        } catch (Exception e) {
+            at.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/shelters/adoptions";
+        }
+    }
+
+    @PostMapping("/adoptions/{id}/reject")
+    public String reject(@PathVariable Long id, RedirectAttributes at) {
+        try {
+            var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+            var user = userService.getByUsername(username);
+            var adoption = adoptionService.get(id);
+
+            if (!adoption.getPet().getShelter().getManager().getId().equals(user.getId())) {
+                throw new AccessDeniedException("You are not the manager!");
+            }
+
+            adoptionService.reject(id);
+            at.addFlashAttribute("successMessage", "You have rejected a request.");
             return "redirect:/shelters/adoptions";
         } catch (Exception e) {
             at.addFlashAttribute("errorMessage", e.getMessage());
