@@ -140,10 +140,17 @@ public class PetController {
 
     @PostMapping("/{id}/adopt")
     public String submitAdoption(@PathVariable Long id,
-                                 @ModelAttribute("adoption") AdoptionCreateRequest dto,
-                                 RedirectAttributes redirect) {
-        var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+                                 @Valid @ModelAttribute("adoption") AdoptionCreateRequest dto,
+                                 BindingResult result,
+                                 RedirectAttributes redirect,
+                                 Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("pet", petService.summary(petService.get(id)));
+            return "adoptions/create";
+        }
+
         try {
+            var username = requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
             adoptionService.create(id, username, dto);
             redirect.addFlashAttribute("successMessage", "Your adoption request has been sent!");
             return "redirect:/pets/" + id;
