@@ -1,13 +1,9 @@
-package com.awbd.pawsy.integration.adoption;
+package com.awbd.pawsy.integration.appointment;
 
-import com.awbd.pawsy.adoption.dto.AppointmentCreateRequest;
 import com.awbd.pawsy.adoption.model.AppointmentStatus;
-import com.awbd.pawsy.adoption.repository.AdoptionRepository;
 import com.awbd.pawsy.adoption.repository.AppointmentRepository;
-import com.awbd.pawsy.adoption.service.AppointmentService;
 import com.awbd.pawsy.pet.dto.PetCreateRequest;
 import com.awbd.pawsy.pet.dto.ShelterCreateRequest;
-import com.awbd.pawsy.pet.model.PetStatus;
 import com.awbd.pawsy.pet.service.PetService;
 import com.awbd.pawsy.pet.service.ShelterService;
 import com.awbd.pawsy.user.dto.UserCreateRequest;
@@ -19,15 +15,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
@@ -37,19 +32,10 @@ import java.time.LocalDate;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class AdoptionRequestFlowIT {
-
-    @Autowired
-    private MockMvc mockMvc;
+public class AppointmentFlowIT {
 
     @Autowired
     private PetService petService;
-
-    @Autowired
-    private AdoptionRepository adoptionRepository;
-
-    @Autowired
-    private AppointmentService appointmentService;
 
     @Autowired
     private AppointmentRepository appointmentRepository;
@@ -60,6 +46,9 @@ public class AdoptionRequestFlowIT {
     @Autowired
     private ShelterService shelterService;
 
+    @Autowired
+    private MockMvc mockMvc;
+
     @BeforeEach
     public void setup() {
         userService.registerUser(new UserCreateRequest("user", "user", "first", "last", "user@user.mail", "0123456789"));
@@ -69,7 +58,7 @@ public class AdoptionRequestFlowIT {
 
     @Test
     @WithMockUser(username = "user", roles = {"ADOPTER"})
-    public void whenPetIsAvailable_adopters_canAdoptThePet() throws Exception {
+    void whenUserTriesMultipleTimes_appointments_shouldPreventDuplicates() throws Exception {
         var user = userService.getByUsername("user");
         log.info("Adopter Id: {}", user.getId());
         var manager = userService.getByUsername("manager");
@@ -79,28 +68,23 @@ public class AdoptionRequestFlowIT {
         var petDto = new PetCreateRequest("pet", "species", 3, "description", "Male", null);
         var pet = petService.create(petDto, shelter);
 
-        appointmentService.create("user", pet.getId(), new AppointmentCreateRequest(LocalDate.now().plusDays(3)));
-        mockMvc.perform(post("/pets/" + pet.getId() + "/adopt")
-                        .param("message", "I would love to adopt this pet!")
+        var date = LocalDate.now().plusDays(3).toString();
+        mockMvc.perform(post("/pets/" + pet.getId() + "/appointments")
+                        .param("appointmentDate", date)
                         .with(csrf()))
                         .andExpect(status().is3xxRedirection());
 
-        var adoption = adoptionRepository.findAll().getFirst();
-        mockMvc.perform(post("/shelters/adoptions/" + adoption.getId() + "/approve")
+        mockMvc.perform(post("/pets/" + pet.getId() + "/appointments")
+                        .param("appointmentDate", date)
                         .with(csrf()))
-                        .andExpect(status().isForbidden());
+                        .andExpect(model().attributeExists("errorMessage"));
 
-        SecurityContextHolder.clearContext();
-        mockMvc.perform(post("/shelters/adoptions/" + adoption.getId() + "/approve")
-                        .with(csrf())
-                        .with(user("manager").roles("ADOPTER", "MANAGER")))
+        var app = appointmentRepository.findAll().getFirst();
+        mockMvc.perform(post("/appointments/" + app.getId() + "/cancel")
+                        .with(csrf()))
                         .andExpect(status().is3xxRedirection());
 
-        var updated = petService.get(pet.getId());
-        assertEquals(PetStatus.Adopted, updated.getStatus());
-
-        var updatedApps = appointmentRepository.findByPetId(pet.getId());
-        assertFalse(updatedApps.isEmpty());
-        assertEquals(AppointmentStatus.Cancelled, updatedApps.getFirst().getStatus());
+        var updated = appointmentRepository.findById(app.getId()).orElseThrow();
+        assertEquals(AppointmentStatus.Cancelled, updated.getStatus());
     }
 }
