@@ -1,4 +1,4 @@
-create table roles
+create table if not exists roles
 (
     id   bigint auto_increment
         primary key,
@@ -7,7 +7,7 @@ create table roles
         unique (name)
 );
 
-create table users
+create table if not exists users
 (
     account_non_expired     bit          null,
     account_non_locked      bit          null,
@@ -27,7 +27,7 @@ create table users
         unique (username)
 );
 
-create table user_roles
+create table if not exists user_roles
 (
     role_id bigint not null,
     user_id bigint not null,
@@ -38,7 +38,7 @@ create table user_roles
         foreign key (user_id) references users (id)
 );
 
-create table shelters
+create table if not exists shelters
 (
     id         bigint auto_increment
         primary key,
@@ -53,7 +53,7 @@ create table shelters
         foreign key (manager_id) references users (id)
 );
 
-create table reviews
+create table if not exists reviews
 (
     rating     int          null,
     adopter_id bigint       not null,
@@ -71,7 +71,7 @@ create table reviews
         foreign key (shelter_id) references shelters (id)
 );
 
-create table pets
+create table if not exists pets
 (
     age         int                                       null,
     id          bigint auto_increment
@@ -87,7 +87,7 @@ create table pets
         foreign key (shelter_id) references shelters (id)
 );
 
-create table appointments
+create table if not exists appointments
 (
     appointment_date  date                                  null,
     adopter_id        bigint                                not null,
@@ -102,7 +102,7 @@ create table appointments
         foreign key (pet_id) references pets (id)
 );
 
-create table adoptions
+create table if not exists adoptions
 (
     adopter_id    bigint                                   not null,
     approval_date timestamp(6)                              null,
