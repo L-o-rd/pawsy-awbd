@@ -12,6 +12,8 @@ import com.awbd.pawsy.user.dto.UserMapper;
 import com.awbd.pawsy.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
@@ -36,7 +38,7 @@ public class UserService {
         log.info("Registering user `{}`.", dto.username());
         user.setPassword(passwordEncoder.encode(dto.password()));
         var adopterRole = roleRepository.findRoleByName("ROLE_ADOPTER").orElseThrow(() -> new EntityNotFoundException("Role `ROLE_ADOPTER` was not found."));
-        user.setRoles(Set.of(adopterRole));
+        user.setRoles(new HashSet<>(Set.of(adopterRole)));
         userRepository.save(user);
         log.info("New user registered `{}`.", user.getUsername());
     }

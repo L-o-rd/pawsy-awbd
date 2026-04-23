@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.stream.Collectors;
 
 @Service
-@Profile("dev")
+@Profile({"dev", "test"})
 @RequiredArgsConstructor
 public class PawsyUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
