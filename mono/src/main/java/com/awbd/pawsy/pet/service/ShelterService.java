@@ -8,6 +8,7 @@ import com.awbd.pawsy.pet.specification.ShelterSpecifications;
 import com.awbd.pawsy.user.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import static java.util.Objects.isNull;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ShelterService {
@@ -75,6 +77,7 @@ public class ShelterService {
         shelter.setManager(user);
         shelterRepository.save(shelter);
         userService.makeManager(user);
+        log.info("Shelter `{}` created, managed by user `{}`.", dto.name(), user.getUsername());
     }
 
     public ShelterSummary summary(Long id) {

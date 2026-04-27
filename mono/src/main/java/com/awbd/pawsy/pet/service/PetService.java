@@ -1,6 +1,7 @@
 package com.awbd.pawsy.pet.service;
 
 import com.awbd.pawsy.pet.specification.PetSpecifications;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import com.awbd.pawsy.pet.model.Pet;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PetService {
@@ -85,6 +87,7 @@ public class PetService {
         pet.setShelter(shelter);
         pet.setSpecies(dto.species());
         pet.setStatus(PetStatus.Available);
+        log.info("Pet `{}` added to shelter `{}`.", dto.name(), shelter.getId());
         return petRepository.save(pet);
     }
 
