@@ -11,12 +11,14 @@ import com.awbd.pawsy.pet.service.PetService;
 import com.awbd.pawsy.user.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
@@ -45,11 +47,13 @@ public class AppointmentService {
         var pet = petService.get(petId);
 
         if (pet.getStatus() == PetStatus.Adopted) {
+            log.error("Adopter `{}` tried to book an appointment for adopted pet `{}` on {}.", username, petId, dto.appointmentDate().toString());
             throw new IllegalStateException("This pet has already been adopted!");
         }
 
         if (appointmentRepository.existsByPetIdAndAdopterIdAndStatus(
                 petId, user.getId(), AppointmentStatus.Ongoing)) {
+            log.error("Adopter `{}` tried to book multiple appointments for pet `{}`.", username, petId);
             throw new IllegalStateException("You already have an active appointment for this pet!");
         }
 
@@ -57,6 +61,7 @@ public class AppointmentService {
         if (thatDay.isPresent()) {
             var status = thatDay.get().getStatus();
             if (status.equals(AppointmentStatus.Ongoing) || status.equals(AppointmentStatus.Done)) {
+                log.error("Appointment by adopter `{}` for pet `{}` on {} conflicts with other appointments.", username, petId, dto.appointmentDate().toString());
                 throw new IllegalStateException("Date already booked!");
             }
         }
@@ -68,6 +73,7 @@ public class AppointmentService {
         appointment.setScheduledAtDate(LocalDateTime.now());
         appointment.setStatus(AppointmentStatus.Ongoing);
         appointmentRepository.save(appointment);
+        log.info("Appointment by `{}` for pet `{}` was booked on {}.", username, petId, dto.appointmentDate().toString());
     }
 
     public Appointment get(Long id) {
@@ -77,11 +83,13 @@ public class AppointmentService {
     public void cancel(Long id) {
         var appointment = get(id);
         if (appointment.getStatus() != AppointmentStatus.Ongoing) {
+            log.error("Tried to cancel a done or cancelled appointment ({}).", id);
             throw new IllegalStateException("Appointment cannot be cancelled.");
         }
 
         appointment.setStatus(AppointmentStatus.Cancelled);
         appointmentRepository.save(appointment);
+        log.info("Appointment {} was cancelled.", id);
     }
 
     public void cancelAllForPet(Long petId) {

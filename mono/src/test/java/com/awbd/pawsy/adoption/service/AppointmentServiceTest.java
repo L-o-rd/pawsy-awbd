@@ -86,7 +86,7 @@ class AppointmentServiceTest {
         pet.setStatus(PetStatus.Adopted);
         when(userService.getByUsername(username)).thenReturn(user);
         when(petService.get(1L)).thenReturn(pet);
-        var ex = assertThrows(IllegalStateException.class, () -> appointmentService.create(username, 1L, new AppointmentCreateRequest(null)));
+        var ex = assertThrows(IllegalStateException.class, () -> appointmentService.create(username, 1L, new AppointmentCreateRequest(LocalDate.MAX)));
         assertEquals("This pet has already been adopted!", ex.getMessage());
         verify(userService).getByUsername(username);
         verify(petService).get(1L);

@@ -7,6 +7,7 @@ import com.awbd.pawsy.pet.model.Review;
 import com.awbd.pawsy.pet.repository.ReviewRepository;
 import com.awbd.pawsy.user.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -52,6 +54,7 @@ public class ReviewService {
         review.setCreatedAt(LocalDateTime.now());
         review.setEditedAt(null);
         reviewRepository.save(review);
+        log.info("Review by `{}` for shelter `{}` created.", username, shelterId);
     }
 
     public void edit(String username, Long shelterId, ReviewCreateRequest dto) {
