@@ -4,6 +4,7 @@ import com.awbd.pawsy.adoption.dto.AdoptionCreateRequest;
 import com.awbd.pawsy.adoption.dto.AppointmentCreateRequest;
 import com.awbd.pawsy.adoption.service.AdoptionService;
 import com.awbd.pawsy.adoption.service.AppointmentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -24,6 +25,7 @@ import jakarta.validation.Valid;
 
 import java.time.LocalDate;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/pets")
@@ -125,9 +127,15 @@ public class PetController {
 
     @PostMapping("/{id}/delete")
     public String deletePet(@PathVariable Long id, RedirectAttributes redirect) {
-        petService.delete(id);
-        redirect.addFlashAttribute("successMessage", "Pet deleted successfully!");
-        return "redirect:/shelters/pets";
+        try {
+            petService.delete(id);
+            redirect.addFlashAttribute("successMessage", "Pet deleted successfully!");
+            return "redirect:/shelters/pets";
+        } catch (Exception e) {
+            log.error("Failed to delete pet `{}`.", id, e);
+            redirect.addFlashAttribute("errorMessage", "Failed to delete pet.");
+            return "redirect:/shelters/pets";
+        }
     }
 
     @GetMapping("/{id}/adopt")
