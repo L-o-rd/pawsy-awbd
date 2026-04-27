@@ -10,12 +10,14 @@ import com.awbd.pawsy.pet.service.PetService;
 import com.awbd.pawsy.user.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdoptionService {
@@ -29,6 +31,7 @@ public class AdoptionService {
         var user = userService.getByUsername(username);
         var pet = petService.get(petId);
         if (adoptionRepository.existsByAdopterIdAndPetId(user.getId(), petId)) {
+            log.error("Adopter `{}` tried to request the same pet `{}`.", username, petId);
             throw new IllegalStateException("You already requested this pet.");
         }
 
@@ -39,6 +42,7 @@ public class AdoptionService {
         adoption.setStatus(AdoptionStatus.Pending);
         adoption.setApprovalDate(null);
         adoptionRepository.save(adoption);
+        log.info("Adoption request by `{}` for pet `{}` created successfully.", username, petId);
     }
 
     public List<AdoptionSummary> getRequestsForShelter(Long shelterId) {

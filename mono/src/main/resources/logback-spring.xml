@@ -1,0 +1,26 @@
+<configuration>
+    <!-- Keep Spring Boot default config -->
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/pawsy-errors.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/pawsy-error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Attach to root -->
+    <root level="INFO">
+        <appender-ref ref="ERROR_FILE"/>
+    </root>
+</configuration>
