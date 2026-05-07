@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pawsy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pawsy
+  template:
+    metadata:
+      labels:
+        app: pawsy
+    spec:
+      containers:
+        - name: pawsy
+          image: pawsy
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: pawsy-config
