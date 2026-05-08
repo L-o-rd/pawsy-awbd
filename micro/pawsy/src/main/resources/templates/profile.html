@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title>My Profile • Pawsy</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-body-tertiary">
+
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<section class="py-5 bg-danger-subtle">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-6">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body p-5">
+
+                        <!-- HEADER -->
+                        <div class="text-center mb-4">
+
+                            <h3 class="fw-bold text-danger-emphasis">
+                                My Profile
+                            </h3>
+
+                            <p class="text-muted">
+                                Manage your personal information
+                            </p>
+
+                        </div>
+
+                        <!-- ALERTS -->
+                        <div th:if="${successMessage}"
+                             class="alert alert-success text-center"
+                             th:text="${successMessage}">
+                        </div>
+
+                        <!-- FORM -->
+                        <form th:action="@{/profile}" method="post" th:object="${user}">
+
+                            <!-- USERNAME (READ-ONLY) -->
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input id="username" type="text"
+                                       th:field="*{username}"
+                                       class="form-control rounded-3 bg-light"
+                                       readonly>
+                            </div>
+
+                            <!-- EMAIL (READ-ONLY) -->
+                            <div class="mb-4">
+                                <label for="email" class="form-label">Email</label>
+                                <input id="email" type="email"
+                                       th:field="*{email}"
+                                       class="form-control rounded-3 bg-light"
+                                       readonly>
+                            </div>
+
+                            <!-- NAME -->
+                            <div class="row g-3 mb-3">
+
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input id="firstName" type="text"
+                                           th:field="*{firstName}"
+                                           class="form-control rounded-3">
+                                    <div class="text-danger small" th:errors="*{firstName}"></div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input id="lastName" type="text"
+                                           th:field="*{lastName}"
+                                           class="form-control rounded-3">
+                                    <div class="text-danger small" th:errors="*{lastName}"></div>
+                                </div>
+
+                            </div>
+
+                            <!-- PHONE -->
+                            <div class="mb-4">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input id="phone" type="text"
+                                       th:field="*{phone}"
+                                       class="form-control rounded-3">
+                                <div class="text-danger small" th:errors="*{phone}"></div>
+                            </div>
+
+                            <!-- ACTION -->
+                            <button type="submit"
+                                    class="btn btn-danger w-100 py-3 pawsy-btn d-flex align-items-center justify-content-center gap-2">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24">
+                                    <path d="M5 13l4 4L19 7"/>
+                                </svg>
+
+                                Save
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                <p class="text-muted small text-center mt-3">
+                    Username and email cannot be changed for security reasons.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+    $(function(){
+
+        $(".pawsy-btn").hover(
+            function(){ $(this).stop().animate({marginTop:"-3px"},120); },
+            function(){ $(this).stop().animate({marginTop:"0px"},120); }
+        );
+
+    });
+</script>
+
+</body>
+</html>
