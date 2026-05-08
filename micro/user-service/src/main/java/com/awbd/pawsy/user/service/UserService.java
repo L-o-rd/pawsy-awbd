@@ -3,6 +3,7 @@ package com.awbd.pawsy.user.service;
 import com.awbd.pawsy.user.dto.UserCreateRequest;
 import com.awbd.pawsy.user.dto.UserMapper;
 import com.awbd.pawsy.user.dto.UserSummary;
+import com.awbd.pawsy.user.dto.UserUpdateRequest;
 import com.awbd.pawsy.user.model.User;
 import com.awbd.pawsy.user.repository.RoleRepository;
 import com.awbd.pawsy.user.repository.UserRepository;
@@ -50,5 +51,13 @@ public class UserService {
 
     public UserSummary summary(User user) {
         return userMapper.toSummary(user);
+    }
+
+    public void updateByUsername(final String username, UserUpdateRequest dto) {
+        var user = getByUsername(username).orElseThrow(() -> new EntityNotFoundException("No such user `%s`.".formatted(username)));
+        user.setFirstName(dto.firstName());
+        user.setLastName(dto.lastName());
+        user.setPhone(dto.phone());
+        userRepository.save(user);
     }
 }

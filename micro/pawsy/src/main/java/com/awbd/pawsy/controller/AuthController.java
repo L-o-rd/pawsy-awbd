@@ -2,6 +2,8 @@ package com.awbd.pawsy.controller;
 
 import com.awbd.pawsy.client.UserClient;
 import com.awbd.pawsy.dto.UserCreateRequest;
+import com.awbd.pawsy.dto.UserUpdateRequest;
+import com.awbd.pawsy.security.ContextUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -10,11 +12,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("")
 @RequiredArgsConstructor
 public class AuthController {
     private final UserClient userClient;
@@ -46,5 +46,26 @@ public class AuthController {
     @GetMapping("/login")
     public String login() {
         return "login";
+    }
+
+    @GetMapping("/profile")
+    public String myProfile(Model model) {
+        var user = userClient.getProfileForUpdate(ContextUtils.getCurrentUsername()).orElseThrow(() -> new RuntimeException("Not logged in for profile."));
+        model.addAttribute("user", user);
+        return "profile";
+    }
+
+    @PostMapping("/profile")
+    public String updateProfile(@Valid @ModelAttribute("user") UserUpdateRequest dto,
+                                BindingResult result,
+                                RedirectAttributes redirect) {
+
+        if (result.hasErrors()) {
+            return "profile";
+        }
+
+        userClient.update(ContextUtils.getCurrentUsername(), dto);
+        redirect.addFlashAttribute("successMessage", "Profile updated successfully!");
+        return "redirect:/profile";
     }
 }
