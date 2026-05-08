@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Pawsy • Something went wrong</title>
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+
+    <style>
+        .pawsy-error-hero {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pawsy-card {
+            border: 0;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .pawsy-icon {
+            width: 80px;
+            height: 80px;
+        }
+    </style>
+</head>
+
+<body class="bg-body-tertiary">
+
+<!-- NAVBAR -->
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<section class="pawsy-error-hero bg-danger-subtle">
+
+    <div class="container text-center">
+
+        <div class="card pawsy-card p-5 mx-auto" style="max-width: 650px;">
+
+            <!-- ICON -->
+            <div class="mb-4">
+
+                <svg class="pawsy-icon" viewBox="0 0 24 24" fill="#dc3545">
+                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+
+            </div>
+
+            <h1 class="fw-bold text-danger-emphasis mb-3">
+                Something went wrong
+            </h1>
+
+            <p class="text-muted mb-4">
+                We’re sorry — an unexpected error occurred while processing your request.
+            </p>
+
+            <!-- OPTIONAL DEBUG INFO -->
+            <div class="small text-muted mb-4" th:if="${status != null}">
+                Error code: <span th:text="${status}">500</span>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="d-flex justify-content-center gap-3">
+
+                <a href="/" class="btn btn-danger px-4 py-2 pawsy-btn">
+                    Go Home
+                </a>
+
+                <a href="javascript:location.reload()" class="btn btn-outline-danger px-4 py-2 pawsy-btn">
+                    Retry
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+    $(function () {
+        $(".pawsy-btn").hover(
+            function () { $(this).stop().animate({ marginTop: "-3px" }, 120); },
+            function () { $(this).stop().animate({ marginTop: "0px" }, 120); }
+        );
+    });
+</script>
+
+</body>
+</html>
