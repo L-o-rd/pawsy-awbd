@@ -1,6 +1,7 @@
 package com.awbd.pawsy.controller;
 
 import com.awbd.pawsy.client.PetClient;
+import com.awbd.pawsy.dto.ReviewCreateRequest;
 import com.awbd.pawsy.dto.ShelterCreateRequest;
 import com.awbd.pawsy.security.ContextUtils;
 import com.awbd.pawsy.security.PawsyUserDetailsService;
@@ -37,6 +38,15 @@ public class ShelterController {
         return "shelters/list";
     }
 
+    @GetMapping("/pets")
+    public String myPets(@RequestParam(defaultValue = "0") Integer page,
+                         @RequestParam(defaultValue = "6") Integer size,
+                         Model model) {
+        var petsPage = petClient.getPetsForShelterByManager(ContextUtils.getCurrentUsername(), page, size);
+        model.addAttribute("petsPage", petsPage);
+        return "shelters/pets";
+    }
+
     @GetMapping("/apply")
     public String showApplyForm(Model model) {
         model.addAttribute("shelter", new ShelterCreateRequest(null, null, null, null, null));
@@ -70,5 +80,26 @@ public class ShelterController {
             redirect.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/shelters/apply";
         }
+    }
+
+    @GetMapping("/{id}")
+    public String shelterDetails(@PathVariable Long id,
+                                 @RequestParam(defaultValue = "0") Integer page,
+                                 @RequestParam(defaultValue = "6") Integer size,
+                                 @RequestParam(defaultValue = "createdAt") String sort,
+                                 Model model) {
+        var username = ContextUtils.getCurrentUsername();
+        var shelter = petClient.getShelterByManager(username).orElseThrow(() -> new RuntimeException("You have no shelter under management."));
+        var petsPage = petClient.getPetsForShelterByManager(username, page, size);
+        var reviewsPage = petClient.getReviewsForShelter(shelter.id(), page, size, sort);
+        var userReview = petClient.getReviewForUserAndShelter(username, id);
+
+        model.addAttribute("petsPage", petsPage);
+        model.addAttribute("shelter", shelter);
+        model.addAttribute("reviewsPage", reviewsPage);
+
+        model.addAttribute("reviewForm", new ReviewCreateRequest(null, null));
+        model.addAttribute("userReview", userReview.orElse(null));
+        return "shelters/profile";
     }
 }

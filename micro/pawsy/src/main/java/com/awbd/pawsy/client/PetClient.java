@@ -1,9 +1,6 @@
 package com.awbd.pawsy.client;
 
-import com.awbd.pawsy.dto.PageResponse;
-import com.awbd.pawsy.dto.PetResponse;
-import com.awbd.pawsy.dto.ShelterCreateRequest;
-import com.awbd.pawsy.dto.ShelterResponse;
+import com.awbd.pawsy.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -89,5 +86,41 @@ public class PetClient {
                 .uri("/shelters")
                 .retrieve()
                 .body(type);
+    }
+
+    public PageResponse<PetResponse> getPetsForShelterByManager(String username, Integer page, Integer size) {
+        final var type = new ParameterizedTypeReference<PageResponse<PetResponse>>() {};
+        return restClient.get()
+                .uri(uri -> uri.path("/shelters/by-manager/%s/pets".formatted(username))
+                        .queryParam("page", page)
+                        .queryParam("size", size)
+                        .build())
+                .retrieve()
+                .body(type);
+    }
+
+    public PageResponse<ReviewResponse> getReviewsForShelter(Long shelterId, Integer page, Integer size, String sort) {
+        final var type = new ParameterizedTypeReference<PageResponse<ReviewResponse>>() {};
+        return restClient.get()
+                .uri(uri -> uri.path("/shelters/%d/reviews".formatted(shelterId))
+                        .queryParam("sort", sort)
+                        .queryParam("page", page)
+                        .queryParam("size", size)
+                        .build())
+                .retrieve()
+                .body(type);
+    }
+
+    public Optional<ReviewResponse> getReviewForUserAndShelter(String username, Long shelterId) {
+        try {
+            var response = restClient.get()
+                    .uri("/reviews/for-user/{username}/at-shelter/{shelterId}", username, shelterId)
+                    .retrieve()
+                    .body(ReviewResponse.class);
+
+            return Optional.ofNullable(response);
+        } catch (HttpClientErrorException.NotFound ignored) {
+            return Optional.empty();
+        }
     }
 }

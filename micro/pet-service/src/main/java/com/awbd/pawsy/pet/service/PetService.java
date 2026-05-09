@@ -1,6 +1,7 @@
 package com.awbd.pawsy.pet.service;
 
 import com.awbd.pawsy.pet.specification.PetSpecifications;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ import com.awbd.pawsy.pet.model.Pet;
 @Service
 @RequiredArgsConstructor
 public class PetService {
+    private final ShelterService shelterService;
     private final PetRepository petRepository;
     private final PetMapper petMapper;
 
@@ -56,5 +58,11 @@ public class PetService {
 
         Pageable finalPageable = PageRequest.of(page, size, sorting);
         return petRepository.findAll(spec, finalPageable).map(petMapper::toSummary);
+    }
+
+    public Page<PetSummary> getPetsByManager(String username, Integer page, Integer size) {
+        var shelter = shelterService.getByManager(username).orElseThrow(() -> new EntityNotFoundException("User `%s` has no shelter.".formatted(username)));
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").descending());
+        return petRepository.findByShelterId(shelter.id(), pageable).map(petMapper::toSummary);
     }
 }

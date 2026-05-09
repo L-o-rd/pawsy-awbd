@@ -2,6 +2,8 @@ package com.awbd.pawsy.pet.controller;
 
 import com.awbd.pawsy.pet.dto.PageResponse;
 import com.awbd.pawsy.pet.dto.ShelterCreateRequest;
+import com.awbd.pawsy.pet.service.PetService;
+import com.awbd.pawsy.pet.service.ReviewService;
 import com.awbd.pawsy.pet.service.ShelterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,8 @@ import java.net.URI;
 @RequestMapping("/shelters")
 public class ShelterController {
     private final ShelterService shelterService;
+    private final ReviewService reviewService;
+    private final PetService petService;
 
     @GetMapping
     public ResponseEntity<?> all() {
@@ -35,6 +39,23 @@ public class ShelterController {
     public ResponseEntity<?> getByManager(@PathVariable String manager) {
         var shelter = shelterService.getByManager(manager);
         return shelter.isPresent() ? ResponseEntity.ok().body(shelter) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/by-manager/{manager}/pets")
+    public ResponseEntity<?> getPetsByManager(@PathVariable String manager,
+                                              @RequestParam(defaultValue = "0") Integer page,
+                                              @RequestParam(defaultValue = "12") Integer size) {
+        var petsPage = petService.getPetsByManager(manager, page, size);
+        return ResponseEntity.ok().body(PageResponse.collect(petsPage));
+    }
+
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<?> getReviews(@PathVariable Long id,
+                                        @RequestParam(defaultValue = "0") Integer page,
+                                        @RequestParam(defaultValue = "12") Integer size,
+                                        @RequestParam(defaultValue = "createdAt") String sort) {
+        var reviewsPage = reviewService.getPageForShelter(id, page, size, sort);
+        return ResponseEntity.ok().body(PageResponse.collect(reviewsPage));
     }
 
     @PostMapping
