@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -31,6 +33,12 @@ public class UserController {
                 ResponseEntity.notFound().build();
     }
 
+    @PostMapping("/by-name/{username}/promote")
+    public ResponseEntity<?> promote(@PathVariable String username) {
+        userService.makeManager(username);
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/by-name/{username}")
     public ResponseEntity<?> updateByUsername(@PathVariable String username, @RequestBody UserUpdateRequest dto) {
         try {
@@ -39,5 +47,12 @@ public class UserController {
         } catch (EntityNotFoundException ignored) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/stats/count")
+    public ResponseEntity<?> count() {
+        return ResponseEntity.ok().body(Map.of(
+            "count", userService.count()
+        ));
     }
 }

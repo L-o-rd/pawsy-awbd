@@ -25,6 +25,13 @@ public class UserClient {
         this.userMapper = userMapper;
     }
 
+    public void makeManager(String username) {
+        restClient.post()
+                .uri("/users/by-name/{username}/promote", username)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
     public Optional<UserResponse> getByUsername(String username) {
         try {
             var response = restClient.get()
