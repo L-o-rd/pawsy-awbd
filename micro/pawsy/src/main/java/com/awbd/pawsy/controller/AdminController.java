@@ -1,5 +1,6 @@
 package com.awbd.pawsy.controller;
 
+import com.awbd.pawsy.client.PetClient;
 import com.awbd.pawsy.client.UserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,17 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 public class AdminController {
     private final UserClient userClient;
+    private final PetClient petClient;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("stats", userClient.getAdminStats());
-        model.addAttribute("recentReviews", userClient.getRecentReviews());
+        model.addAttribute("recentReviews", petClient.getRecentReviews());
         return "admin/dashboard";
     }
 
     @PostMapping("/reviews/{id}/delete")
     public String deleteReview(@PathVariable Long id) {
-        userClient.deleteReviewById(id);
+        petClient.deleteReviewById(id);
         return "redirect:/admin/dashboard";
     }
 }

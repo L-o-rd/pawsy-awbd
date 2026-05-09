@@ -60,4 +60,16 @@ public class UserService {
         user.setPhone(dto.phone());
         userRepository.save(user);
     }
+
+    public void makeManager(String username) {
+        var user = getByUsername(username).orElseThrow(() -> new EntityNotFoundException("No such user `%s`.".formatted(username)));
+        var roles = user.getRoles();
+        roles.add(roleRepository.findRoleByName("ROLE_MANAGER").orElseThrow());
+        user.setRoles(roles);
+        userRepository.save(user);
+    }
+
+    public Long count() {
+        return userRepository.count();
+    }
 }

@@ -6,5 +6,5 @@ public record ShelterResponse(
    String location,
    String email,
    String phone,
-   Long managerId
+   String manager
 ) {}
