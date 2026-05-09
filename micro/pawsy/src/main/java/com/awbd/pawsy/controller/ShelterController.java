@@ -1,5 +1,6 @@
 package com.awbd.pawsy.controller;
 
+import com.awbd.pawsy.client.AdoptionClient;
 import com.awbd.pawsy.client.PetClient;
 import com.awbd.pawsy.dto.ReviewCreateRequest;
 import com.awbd.pawsy.dto.ShelterCreateRequest;
@@ -7,6 +8,7 @@ import com.awbd.pawsy.security.ContextUtils;
 import com.awbd.pawsy.security.PawsyUserDetailsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/shelters")
 public class ShelterController {
     private final PawsyUserDetailsService pawsyUserDetailsService;
+    private final AdoptionClient adoptionClient;
     private final PetClient petClient;
 
     @GetMapping
@@ -134,6 +137,48 @@ public class ShelterController {
         } catch (Exception e) {
             redirect.addFlashAttribute("errorMessage", "Failed to submit review.");
             return "redirect:/shelters/" + id;
+        }
+    }
+
+    @GetMapping("/adoptions")
+    public String adoptionRequests(Model model) {
+        var shelter = petClient.getShelterByManager(ContextUtils.getCurrentUsername()).orElseThrow(() -> new RuntimeException("No shelter in adoption requests?"));
+        var requests = adoptionClient.getRequestsForShelter(shelter.id());
+        model.addAttribute("requests", requests);
+        return "shelters/adoptions";
+    }
+
+    @PostMapping("/adoptions/{id}/approve")
+    public String approve(@PathVariable Long id, RedirectAttributes at) {
+        try {
+            var adoption = adoptionClient.getById(id).orElseThrow(() -> new RuntimeException("No adoption in approve?"));
+            var shelter = petClient.getShelterById(adoption.pet().shelterId()).orElseThrow(() -> new RuntimeException("No shelter in approve?"));
+            if (!shelter.manager().equals(ContextUtils.getCurrentUsername()))
+                throw new AccessDeniedException("You are not the manager!");
+
+            adoptionClient.approveRequest(id);
+            at.addFlashAttribute("successMessage", "You have approved a request.");
+            return "redirect:/shelters/adoptions";
+        } catch (Exception e) {
+            at.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/shelters/adoptions";
+        }
+    }
+
+    @PostMapping("/adoptions/{id}/reject")
+    public String reject(@PathVariable Long id, RedirectAttributes at) {
+        try {
+            var adoption = adoptionClient.getById(id).orElseThrow(() -> new RuntimeException("No adoption in reject?"));
+            var shelter = petClient.getShelterById(adoption.pet().shelterId()).orElseThrow(() -> new RuntimeException("No shelter in reject?"));
+            if (!shelter.manager().equals(ContextUtils.getCurrentUsername()))
+                throw new AccessDeniedException("You are not the manager!");
+
+            adoptionClient.rejectRequest(id);
+            at.addFlashAttribute("successMessage", "You have rejected a request.");
+            return "redirect:/shelters/adoptions";
+        } catch (Exception e) {
+            at.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/shelters/adoptions";
         }
     }
 }
