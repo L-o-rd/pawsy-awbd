@@ -69,6 +69,19 @@ public class PetClient {
         }
     }
 
+    public Optional<ShelterResponse> getShelterById(Long shelterId) {
+        try {
+            var response = restClient.get()
+                    .uri("/shelters/{shelterId}", shelterId)
+                    .retrieve()
+                    .body(ShelterResponse.class);
+
+            return Optional.ofNullable(response);
+        } catch (HttpClientErrorException.NotFound ignored) {
+            return Optional.empty();
+        }
+    }
+
     public void createShelter(ShelterCreateRequest dto, String manager) {
         var linked = new ShelterCreateRequest(dto.name(), dto.location(), dto.email(), dto.phone(), manager);
         restClient.post()
@@ -122,5 +135,43 @@ public class PetClient {
         } catch (HttpClientErrorException.NotFound ignored) {
             return Optional.empty();
         }
+    }
+
+    public void deleteReviewForUserAndShelter(String username, Long shelterId) {
+        restClient.delete()
+                .uri("/reviews/for-user/{username}/at-shelter/{shelterId}", username, shelterId)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void createReviewForUserAndShelter(String username, Long shelterId, ReviewCreateRequest dto) {
+        restClient.post()
+                .uri("/reviews/for-user/{username}/at-shelter/{shelterId}", username, shelterId)
+                .body(dto)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void editReviewForUserAndShelter(String username, Long shelterId, ReviewCreateRequest dto) {
+        restClient.put()
+                .uri("/reviews/for-user/{username}/at-shelter/{shelterId}", username, shelterId)
+                .body(dto)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void deleteReviewById(Long reviewId) {
+        restClient.delete()
+                .uri("/reviews/{reviewId}", reviewId)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public List<ReviewResponse> getRecentReviews() {
+        final var type = new ParameterizedTypeReference<List<ReviewResponse>>() {};
+        return restClient.get()
+                .uri("/reviews/recent")
+                .retrieve()
+                .body(type);
     }
 }

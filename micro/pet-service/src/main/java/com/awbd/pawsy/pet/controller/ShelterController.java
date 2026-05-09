@@ -41,6 +41,12 @@ public class ShelterController {
         return shelter.isPresent() ? ResponseEntity.ok().body(shelter) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getByManager(@PathVariable Long id) {
+        var shelter = shelterService.getById(id);
+        return shelter.isPresent() ? ResponseEntity.ok().body(shelter.get()) : ResponseEntity.notFound().build();
+    }
+
     @GetMapping("/by-manager/{manager}/pets")
     public ResponseEntity<?> getPetsByManager(@PathVariable String manager,
                                               @RequestParam(defaultValue = "0") Integer page,

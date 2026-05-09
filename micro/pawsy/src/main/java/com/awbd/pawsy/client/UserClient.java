@@ -67,12 +67,9 @@ public class UserClient {
     }
 
     public AdminStats getAdminStats() {
-        return new AdminStats(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L);
+        return restClient.get()
+                .uri("/admin/stats")
+                .retrieve()
+                .body(AdminStats.class);
     }
-
-    public List<?> getRecentReviews() {
-        return List.of();
-    }
-
-    public void deleteReviewById(Long reviewId) {}
 }

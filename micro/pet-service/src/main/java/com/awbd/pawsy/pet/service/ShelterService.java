@@ -36,6 +36,10 @@ public class ShelterService {
         return shelterRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Shelter with id %d was not found.".formatted(id)));
     }
 
+    public Optional<ShelterSummary> getById(Long id) {
+        return shelterRepository.findById(id).map(shelterMapper::toSummary);
+    }
+
     public Page<ShelterSummary> search(String name, String location, String sort, Integer page, Integer size) {
         Specification<Shelter> spec = (root, query, cb) -> cb.conjunction();
 

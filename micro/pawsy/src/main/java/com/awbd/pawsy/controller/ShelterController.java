@@ -88,11 +88,10 @@ public class ShelterController {
                                  @RequestParam(defaultValue = "6") Integer size,
                                  @RequestParam(defaultValue = "createdAt") String sort,
                                  Model model) {
-        var username = ContextUtils.getCurrentUsername();
-        var shelter = petClient.getShelterByManager(username).orElseThrow(() -> new RuntimeException("You have no shelter under management."));
-        var petsPage = petClient.getPetsForShelterByManager(username, page, size);
-        var reviewsPage = petClient.getReviewsForShelter(shelter.id(), page, size, sort);
-        var userReview = petClient.getReviewForUserAndShelter(username, id);
+        var shelter = petClient.getShelterById(id).orElseThrow(() -> new RuntimeException("No shelter in details?"));
+        var petsPage = petClient.getPetsForShelterByManager(shelter.manager(), page, size);
+        var reviewsPage = petClient.getReviewsForShelter(id, page, size, sort);
+        var userReview = petClient.getReviewForUserAndShelter(ContextUtils.getCurrentUsername(), id);
 
         model.addAttribute("petsPage", petsPage);
         model.addAttribute("shelter", shelter);
@@ -101,5 +100,40 @@ public class ShelterController {
         model.addAttribute("reviewForm", new ReviewCreateRequest(null, null));
         model.addAttribute("userReview", userReview.orElse(null));
         return "shelters/profile";
+    }
+
+    @PostMapping("/{id}/review/delete")
+    public String deleteReview(@PathVariable Long id) {
+        petClient.deleteReviewForUserAndShelter(ContextUtils.getCurrentUsername(), id);
+        return "redirect:/shelters/" + id;
+    }
+
+    @PostMapping("/{id}/review")
+    public String submitReview(@PathVariable Long id,
+                               @Valid @ModelAttribute("reviewForm") ReviewCreateRequest dto,
+                               BindingResult result,
+                               RedirectAttributes redirect) {
+
+        var username = ContextUtils.getCurrentUsername();
+        var userReview = petClient.getReviewForUserAndShelter(username, id);
+        if (result.hasErrors()) {
+            redirect.addFlashAttribute("errorMessage", "Reviews should be at least 10 characters.");
+            return "redirect:/shelters/" + id;
+        }
+
+        try {
+            if (userReview.isEmpty()) {
+                petClient.createReviewForUserAndShelter(username, id, dto);
+                redirect.addFlashAttribute("successMessage", "Review created!");
+            } else {
+                petClient.editReviewForUserAndShelter(username, id, dto);
+                redirect.addFlashAttribute("successMessage", "Review edited!");
+            }
+
+            return "redirect:/shelters/" + id;
+        } catch (Exception e) {
+            redirect.addFlashAttribute("errorMessage", "Failed to submit review.");
+            return "redirect:/shelters/" + id;
+        }
     }
 }
