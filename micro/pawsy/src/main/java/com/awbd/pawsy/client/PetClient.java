@@ -82,6 +82,23 @@ public class PetClient {
         }
     }
 
+    public Optional<PetResponse> getPetById(Long petId) {
+        try {
+            var response = restClient.get()
+                    .uri("/pets/{petId}", petId)
+                    .retrieve()
+                    .body(PetResponse.class);
+
+            return Optional.ofNullable(response);
+        } catch (HttpClientErrorException.NotFound ignored) {
+            return Optional.empty();
+        }
+    }
+
+    public List<PetResponse> getRelatedPets(Long ignored) {
+        return List.of();
+    }
+
     public void createShelter(ShelterCreateRequest dto, String manager) {
         var linked = new ShelterCreateRequest(dto.name(), dto.location(), dto.email(), dto.phone(), manager);
         restClient.post()
@@ -173,5 +190,35 @@ public class PetClient {
                 .uri("/reviews/recent")
                 .retrieve()
                 .body(type);
+    }
+
+    public PetResponse createPet(PetCreateRequest dto, Long shelterId) {
+        return restClient.post()
+                .uri("/shelters/{shelterId}/pets", shelterId)
+                .body(dto)
+                .retrieve()
+                .body(PetResponse.class);
+    }
+
+    public PetUpdateRequest getPetForUpdate(Long petId) {
+        return restClient.get()
+                .uri("/pets/{petId}/update", petId)
+                .retrieve()
+                .body(PetUpdateRequest.class);
+    }
+
+    public void updatePet(Long petId, PetUpdateRequest dto) {
+        restClient.put()
+                .uri("/pets/{petId}", petId)
+                .body(dto)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void deletePet(Long petId) {
+        restClient.delete()
+                .uri("/pets/{petId}", petId)
+                .retrieve()
+                .toBodilessEntity();
     }
 }

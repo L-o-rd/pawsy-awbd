@@ -1,6 +1,7 @@
 package com.awbd.pawsy.pet.controller;
 
 import com.awbd.pawsy.pet.dto.PageResponse;
+import com.awbd.pawsy.pet.dto.PetCreateRequest;
 import com.awbd.pawsy.pet.dto.ShelterCreateRequest;
 import com.awbd.pawsy.pet.service.PetService;
 import com.awbd.pawsy.pet.service.ReviewService;
@@ -68,5 +69,11 @@ public class ShelterController {
     public ResponseEntity<?> create(@RequestBody ShelterCreateRequest dto) {
         var shelter = shelterService.create(dto);
         return ResponseEntity.created(URI.create("/shelters/%d".formatted(shelter.getId()))).build();
+    }
+
+    @PostMapping("/{id}/pets")
+    public ResponseEntity<?> addPet(@PathVariable Long id, @RequestBody PetCreateRequest dto) {
+        var pet = petService.create(dto, id);
+        return ResponseEntity.created(URI.create("/pets/%d".formatted(pet.id()))).body(pet);
     }
 }
