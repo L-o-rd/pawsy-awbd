@@ -108,4 +108,10 @@ public class PetService {
     public void delete(Long id) {
         petRepository.delete(get(id));
     }
+
+    public void markAdopted(Long id) {
+        var pet = get(id);
+        pet.setStatus(PetStatus.Adopted);
+        petRepository.save(pet);
+    }
 }

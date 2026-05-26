@@ -1,6 +1,8 @@
 package com.awbd.pawsy.controller;
 
+import com.awbd.pawsy.client.AdoptionClient;
 import com.awbd.pawsy.client.PetClient;
+import com.awbd.pawsy.dto.AdoptionCreateRequest;
 import com.awbd.pawsy.dto.PetCreateRequest;
 import com.awbd.pawsy.dto.PetUpdateRequest;
 import com.awbd.pawsy.exception.ResourceNotFoundException;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 @RequestMapping("/pets")
 public class PetController {
+    private final AdoptionClient adoptionClient;
     private final PetClient petClient;
 
     @GetMapping
@@ -119,6 +122,37 @@ public class PetController {
             log.error("Failed to delete pet `{}`.", id, e);
             redirect.addFlashAttribute("errorMessage", "Failed to delete pet.");
             return "redirect:/shelters/pets";
+        }
+    }
+
+    @GetMapping("/{id}/adopt")
+    public String showAdoptionForm(@PathVariable Long id, Model model) {
+        var pet = petClient.getPetById(id).orElseThrow(() -> new RuntimeException("No such pet."));
+        model.addAttribute("adoption", new AdoptionCreateRequest(null));
+        model.addAttribute("pet", pet);
+        return "adoptions/create";
+    }
+
+    @PostMapping("/{id}/adopt")
+    public String submitAdoption(@PathVariable Long id,
+                                 @Valid @ModelAttribute("adoption") AdoptionCreateRequest dto,
+                                 BindingResult result,
+                                 RedirectAttributes redirect,
+                                 Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("pet", petClient.getPetById(id).orElseThrow(() -> new RuntimeException("No such pet.")));
+            return "adoptions/create";
+        }
+
+        try {
+            final var pet = petClient.getPetById(id).orElseThrow(() -> new RuntimeException("No such pet."));
+            var username = ContextUtils.getCurrentUsername();
+            adoptionClient.create(id, pet.shelterId(), username, dto);
+            redirect.addFlashAttribute("successMessage", "Your adoption request has been sent!");
+            return "redirect:/pets/" + id;
+        } catch (Exception e) {
+            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/pets/" + id;
         }
     }
 }

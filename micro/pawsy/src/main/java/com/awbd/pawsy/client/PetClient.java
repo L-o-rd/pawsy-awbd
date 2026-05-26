@@ -221,4 +221,11 @@ public class PetClient {
                 .retrieve()
                 .toBodilessEntity();
     }
+
+    public void markAdopted(Long petId) {
+        restClient.post()
+                .uri("/pets/{petId}/mark-adopted", petId)
+                .retrieve()
+                .toBodilessEntity();
+    }
 }

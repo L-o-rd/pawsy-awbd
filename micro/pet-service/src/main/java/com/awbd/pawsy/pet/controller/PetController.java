@@ -41,6 +41,12 @@ public class PetController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{id}/mark-adopted")
+    public ResponseEntity<?> markAdopted(@PathVariable Long id) {
+        petService.markAdopted(id);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         petService.delete(id);
