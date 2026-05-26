@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adoption-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adoption-service
+  template:
+    metadata:
+      labels:
+        app: adoption-service
+    spec:
+      containers:
+        - name: adoption-service
+          image: adoption-service
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: pawsy-config
+            - secretRef:
+                name: mysql-credentials
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
