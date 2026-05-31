@@ -228,4 +228,11 @@ public class PetClient {
                 .retrieve()
                 .toBodilessEntity();
     }
+
+    public PetStats getStats() {
+        return restClient.get()
+                .uri("/stats")
+                .retrieve()
+                .body(PetStats.class);
+    }
 }

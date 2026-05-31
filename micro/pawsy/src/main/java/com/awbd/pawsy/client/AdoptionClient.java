@@ -166,4 +166,11 @@ public class AdoptionClient {
                 .retrieve()
                 .toBodilessEntity();
     }
+
+    public AdoptionStats getStats() {
+        return restClient.get()
+                .uri("/stats")
+                .retrieve()
+                .body(AdoptionStats.class);
+    }
 }
