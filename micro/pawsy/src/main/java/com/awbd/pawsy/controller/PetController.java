@@ -76,7 +76,7 @@ public class PetController {
             redirect.addFlashAttribute("successMessage", "Pet added successfully!");
             return "redirect:/pets/%d".formatted(createdPet.id());
         } catch (Exception e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", "Cannot add a new pet.");
             return "redirect:/pets/create";
         }
     }
@@ -111,7 +111,7 @@ public class PetController {
             redirect.addFlashAttribute("successMessage", "Pet updated successfully!");
             return "redirect:/pets/" + id;
         } catch (Exception e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", "Encountered an error while trying to update this pet.");
             return "redirect:/pets/" + id;
         }
     }

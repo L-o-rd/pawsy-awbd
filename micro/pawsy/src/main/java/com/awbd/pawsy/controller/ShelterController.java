@@ -80,7 +80,7 @@ public class ShelterController {
             redirect.addFlashAttribute("successMessage", "Your shelter has been registered successfully!");
             return "redirect:/shelters/pets";
         } catch (Exception e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", "Failed to register your shelter.");
             return "redirect:/shelters/apply";
         }
     }
@@ -160,7 +160,7 @@ public class ShelterController {
             at.addFlashAttribute("successMessage", "You have approved a request.");
             return "redirect:/shelters/adoptions";
         } catch (Exception e) {
-            at.addFlashAttribute("errorMessage", e.getMessage());
+            at.addFlashAttribute("errorMessage", "Cannot approve this request.");
             return "redirect:/shelters/adoptions";
         }
     }
@@ -177,7 +177,7 @@ public class ShelterController {
             at.addFlashAttribute("successMessage", "You have rejected a request.");
             return "redirect:/shelters/adoptions";
         } catch (Exception e) {
-            at.addFlashAttribute("errorMessage", e.getMessage());
+            at.addFlashAttribute("errorMessage", "Failed to reject this request.");
             return "redirect:/shelters/adoptions";
         }
     }
