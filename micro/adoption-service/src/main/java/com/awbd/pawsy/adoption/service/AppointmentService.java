@@ -29,6 +29,10 @@ public class AppointmentService {
                 .toList();
     }
 
+    public Boolean anyForPet(Long petId) {
+        return appointmentRepository.existsByPetId(petId);
+    }
+
     public List<LocalDate> getBookedDates(Long petId) {
         return appointmentRepository.findByPetId(petId)
                 .stream()

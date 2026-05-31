@@ -38,7 +38,7 @@ public class AuthController {
             at.addFlashAttribute("successMessage", "Registration successful. You can now login.");
             return "redirect:/register";
         } catch (Exception e) {
-            at.addFlashAttribute("errorMessage", e.getMessage());
+            at.addFlashAttribute("errorMessage", "Cannot register this user.");
             return "redirect:/register";
         }
     }

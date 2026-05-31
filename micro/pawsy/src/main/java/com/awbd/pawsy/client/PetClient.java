@@ -1,6 +1,7 @@
 package com.awbd.pawsy.client;
 
 import com.awbd.pawsy.dto.*;
+import com.awbd.pawsy.exception.AdoptionStateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -216,6 +217,10 @@ public class PetClient {
     }
 
     public void deletePet(Long petId) {
+        final var pet = getPetById(petId).orElseThrow(() -> new AdoptionStateException("No such pet for adoption."));
+        if (pet.status().equals("Adopted") || pet.status().equals("Awaiting"))
+            throw new AdoptionStateException("Pet is currently adopted.");
+
         restClient.delete()
                 .uri("/pets/{petId}", petId)
                 .retrieve()

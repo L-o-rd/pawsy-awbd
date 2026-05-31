@@ -8,6 +8,7 @@ import com.awbd.pawsy.adoption.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,5 +26,12 @@ public class StatsController {
                 appointmentService.count(),
                 appointmentService.countByStatus(AppointmentStatus.Ongoing));
         return ResponseEntity.ok().body(stats);
+    }
+
+    @GetMapping("/is-pet-free/{petId}")
+    public ResponseEntity<?> isPetFree(@PathVariable Long petId) {
+        var appFree = !appointmentService.anyForPet(petId);
+        var adoptFree = !adoptionService.anyForPet(petId);
+        return ResponseEntity.ok().body(appFree && adoptFree);
     }
 }

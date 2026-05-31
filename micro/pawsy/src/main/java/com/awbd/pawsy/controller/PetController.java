@@ -6,6 +6,9 @@ import com.awbd.pawsy.dto.AdoptionCreateRequest;
 import com.awbd.pawsy.dto.AppointmentCreateRequest;
 import com.awbd.pawsy.dto.PetCreateRequest;
 import com.awbd.pawsy.dto.PetUpdateRequest;
+import com.awbd.pawsy.exception.AdoptionDuplicateException;
+import com.awbd.pawsy.exception.AdoptionStateException;
+import com.awbd.pawsy.exception.AppointmentStateException;
 import com.awbd.pawsy.exception.ResourceNotFoundException;
 import com.awbd.pawsy.security.ContextUtils;
 import jakarta.validation.Valid;
@@ -73,7 +76,7 @@ public class PetController {
             redirect.addFlashAttribute("successMessage", "Pet added successfully!");
             return "redirect:/pets/%d".formatted(createdPet.id());
         } catch (Exception e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", "Cannot add a new pet.");
             return "redirect:/pets/create";
         }
     }
@@ -108,7 +111,7 @@ public class PetController {
             redirect.addFlashAttribute("successMessage", "Pet updated successfully!");
             return "redirect:/pets/" + id;
         } catch (Exception e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", "Encountered an error while trying to update this pet.");
             return "redirect:/pets/" + id;
         }
     }
@@ -116,8 +119,18 @@ public class PetController {
     @PostMapping("/{id}/delete")
     public String deletePet(@PathVariable Long id, RedirectAttributes redirect) {
         try {
+            if (!adoptionClient.isPetFree(id)) {
+                log.error("Pet cannot be deleted as it has pending requests `{}`.", id);
+                redirect.addFlashAttribute("errorMessage", "Pet cannot be deleted as it has pending requests");
+                return "redirect:/shelters/pets";
+            }
+
             petClient.deletePet(id);
             redirect.addFlashAttribute("successMessage", "Pet deleted successfully!");
+            return "redirect:/shelters/pets";
+        } catch (AdoptionStateException ase) {
+            log.error("Failed to delete pet `{}`.", id, ase);
+            redirect.addFlashAttribute("errorMessage", ase.getMessage());
             return "redirect:/shelters/pets";
         } catch (Exception e) {
             log.error("Failed to delete pet `{}`.", id, e);
@@ -151,8 +164,11 @@ public class PetController {
             adoptionClient.create(id, pet.shelterId(), username, dto);
             redirect.addFlashAttribute("successMessage", "Your adoption request has been sent!");
             return "redirect:/pets/" + id;
+        } catch (AdoptionDuplicateException ade) {
+            redirect.addFlashAttribute("errorMessage", ade.getMessage());
+            return "redirect:/pets/" + id;
         } catch (Exception e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", "Adoption service has encountered an error.");
             return "redirect:/pets/" + id;
         }
     }
@@ -187,7 +203,7 @@ public class PetController {
             adoptionClient.createAppointment(username, id, pet.shelterId(), dto);
             redirect.addFlashAttribute("successMessage", "You scheduled an appointment!");
             return "redirect:/pets/" + id;
-        } catch (IllegalStateException ise) {
+        } catch (AppointmentStateException ise) {
             final var pet = petClient.getPetById(id).orElseThrow(() -> new RuntimeException("No such pet for submitting appointment."));
             model.addAttribute("pet", pet);
             model.addAttribute("bookedDates", adoptionClient.getBookedDatesFor(id));
