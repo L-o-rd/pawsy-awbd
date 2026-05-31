@@ -46,6 +46,21 @@ public class AdoptionClient {
                 as.status())).toList();
     }
 
+    public List<AdoptionResponse> getRequestsForAdopter(final String username) {
+        final var type = new ParameterizedTypeReference<List<AdoptionSummary>>() {};
+        var vass = restClient.get()
+                .uri("/adoptions/by-user/{username}", username)
+                .retrieve()
+                .body(type);
+
+        final var ass = requireNonNull(vass);
+        return ass.stream().map(as -> new AdoptionResponse(as.id(),
+                petClient.getPetById(as.petId()).orElseThrow(),
+                as.adopterName(),
+                as.requestDate(),
+                as.status())).toList();
+    }
+
     public Optional<AdoptionResponse> getById(Long adoptionId) {
         try {
             var vas = restClient.get()

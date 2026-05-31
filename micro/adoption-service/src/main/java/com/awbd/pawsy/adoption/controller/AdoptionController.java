@@ -18,6 +18,12 @@ public class AdoptionController {
         return ResponseEntity.ok().body(adoptions);
     }
 
+    @GetMapping("/by-user/{username}")
+    public ResponseEntity<?> getForUser(@PathVariable String username) {
+        var adoptions = adoptionService.getRequestsForAdopter(username);
+        return ResponseEntity.ok().body(adoptions);
+    }
+
     @GetMapping("/{adoptionId}")
     public ResponseEntity<?> get(@PathVariable Long adoptionId) {
         return ResponseEntity.ok().body(adoptionService.getById(adoptionId));

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title>My Requests • Pawsy</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-body-tertiary">
+
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<section class="py-5 bg-danger-subtle">
+
+    <div class="container">
+
+        <h3 class="fw-bold text-danger-emphasis mb-4">
+            My Adoption Requests
+        </h3>
+
+        <!-- EMPTY -->
+        <div th:if="${#lists.isEmpty(requests)}" class="text-center py-5">
+
+            <div class="card border-0 shadow-sm rounded-4 p-5">
+
+                <h5 class="fw-semibold text-danger-emphasis">
+                    No requests yet
+                </h5>
+
+                <p class="text-muted mb-4">
+                    Start by adopting a pet you love.
+                </p>
+
+                <a th:href="@{/pets}" class="btn btn-danger pawsy-btn">
+                    Browse Pets
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- LIST -->
+        <div class="row g-4" th:if="${!#lists.isEmpty(requests)}">
+
+            <div class="col-md-6"
+                 th:each="r : ${requests}">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="row g-0 align-items-center">
+
+                        <!-- PET IMAGE -->
+                        <div class="col-4">
+                            <img th:src="@{${r.pet.photo}}"
+                                 class="w-100 rounded-start-4"
+                                 style="height:100%;object-fit:cover" alt="Pet Photo">
+                        </div>
+
+                        <!-- INFO -->
+                        <div class="col-8">
+
+                            <div class="card-body">
+
+                                <h6 class="fw-semibold mb-1"
+                                    th:text="${r.pet.name}">
+                                </h6>
+
+                                <p class="small text-muted mb-2">
+                                    Requested on
+                                    <span th:text="${#temporals.format(r.requestDate, 'dd MMM yyyy')}"></span>
+                                </p>
+
+                                <!-- STATUS -->
+                                <span class="badge mb-3"
+                                      th:classappend="
+                                      ${r.status == 'Pending'} ? 'bg-warning' :
+                                      (${r.status == 'Approved'} ? 'bg-success' : 'bg-secondary')"
+                                      th:text="${r.status}">
+                                </span>
+
+                                <!-- APPROVED -->
+                                <div th:if="${r.status == 'Approved'}"
+                                     class="small text-success mb-2">
+                                    🎉 Congratulations! Your request was approved.
+                                </div>
+
+                                <!-- REJECTED -->
+                                <div th:if="${r.status == 'Rejected'}"
+                                     class="small text-muted mb-2">
+                                    This request was not approved. Keep looking ❤️
+                                </div>
+
+                                <!-- ACTION -->
+                                <a th:href="@{/pets/{id}(id=${r.pet.id})}"
+                                   class="btn btn-outline-danger btn-sm pawsy-btn">
+                                    View Pet
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+    $(function(){
+        $(".pawsy-btn").hover(
+            function(){ $(this).stop().animate({marginTop:"-3px"},120); },
+            function(){ $(this).stop().animate({marginTop:"0px"},120); }
+        );
+    });
+</script>
+
+</body>
+</html>
