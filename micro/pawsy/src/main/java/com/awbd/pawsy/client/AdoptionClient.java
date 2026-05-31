@@ -1,9 +1,13 @@
 package com.awbd.pawsy.client;
 
 import com.awbd.pawsy.dto.*;
+import com.awbd.pawsy.exception.AdoptionClientException;
+import com.awbd.pawsy.exception.AdoptionDuplicateException;
+import com.awbd.pawsy.exception.AppointmentStateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
@@ -125,6 +129,14 @@ public class AdoptionClient {
                             petId, shelterId, username)
                 .body(dto)
                 .retrieve()
+                .onStatus(status -> status.value() == 400,
+                    (req, res) -> {
+                        throw new AdoptionDuplicateException("Adoption request already exists.");
+                    })
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        (req, res) -> {
+                            throw new AdoptionClientException("Adoption service has ran into an error.");
+                        })
                 .toBodilessEntity();
     }
 
@@ -132,7 +144,7 @@ public class AdoptionClient {
         final var pet = petClient.getPetById(petId).orElseThrow();
         if (pet.status().equals("Adopted")) {
             log.error("Adopter `{}` tried to book an appointment for adopted pet `{}` on {}.", username, petId, dto.appointmentDate().toString());
-            throw new IllegalStateException("This pet has already been adopted!");
+            throw new AppointmentStateException("This pet has already been adopted!");
         }
 
         restClient.post()
@@ -140,6 +152,10 @@ public class AdoptionClient {
                         petId, shelterId, username)
                 .body(dto)
                 .retrieve()
+                .onStatus(status -> status.value() == 400,
+                        (req, res) -> {
+                            throw new AppointmentStateException("Could not make an appointment.");
+                        })
                 .toBodilessEntity();
     }
 
@@ -172,5 +188,12 @@ public class AdoptionClient {
                 .uri("/stats")
                 .retrieve()
                 .body(AdoptionStats.class);
+    }
+
+    public Boolean isPetFree(Long petId) {
+        return restClient.get()
+                .uri("/stats/is-pet-free/{petId}", petId)
+                .retrieve()
+                .body(Boolean.class);
     }
 }

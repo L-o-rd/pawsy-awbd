@@ -23,7 +23,16 @@ public class AdoptionService {
     private final AppointmentService appointmentService;
     private final AdoptionMapper adoptionMapper;
 
+    public Boolean anyForPet(Long petId) {
+        return adoptionRepository.existsByPetId(petId);
+    }
+
     public void create(Long petId, Long shelterId, String username, AdoptionCreateRequest dto) {
+        if (adoptionRepository.existsByAdopterAndPetId(username, petId)) {
+            log.error("Adopter `{}` tried to request the same pet `{}`.", username, petId);
+            throw new IllegalStateException("You already requested this pet.");
+        }
+
         var adoption = new Adoption();
         adoption.setAdopter(username);
         adoption.setPetId(petId);

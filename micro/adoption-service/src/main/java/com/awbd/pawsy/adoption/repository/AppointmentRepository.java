@@ -18,4 +18,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByAdopter(String adopter);
     Long countByStatus(AppointmentStatus status);
     List<Appointment> findByPetId(Long petId);
+    boolean existsByPetId(Long petId);
 }
