@@ -3,6 +3,7 @@ package com.awbd.pawsy.controller;
 import com.awbd.pawsy.client.AdoptionClient;
 import com.awbd.pawsy.client.PetClient;
 import com.awbd.pawsy.dto.AdoptionCreateRequest;
+import com.awbd.pawsy.dto.AppointmentCreateRequest;
 import com.awbd.pawsy.dto.PetCreateRequest;
 import com.awbd.pawsy.dto.PetUpdateRequest;
 import com.awbd.pawsy.exception.ResourceNotFoundException;
@@ -152,6 +153,48 @@ public class PetController {
             return "redirect:/pets/" + id;
         } catch (Exception e) {
             redirect.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/pets/" + id;
+        }
+    }
+
+    @GetMapping("/{id}/appointments/new")
+    public String appointmentForm(@PathVariable Long id, Model model) {
+        final var pet = petClient.getPetById(id).orElseThrow(() -> new RuntimeException("No such pet for appointment."));
+        var bookedDates = adoptionClient.getBookedDatesFor(id);
+
+        model.addAttribute("pet", pet);
+        model.addAttribute("appointment", new AppointmentCreateRequest(null));
+        model.addAttribute("bookedDates", bookedDates);
+        return "appointments/create";
+    }
+
+    @PostMapping("/{id}/appointments")
+    public String submitAppointment(@PathVariable Long id,
+                                    @Valid @ModelAttribute("appointment") AppointmentCreateRequest dto,
+                                    BindingResult result,
+                                    RedirectAttributes redirect,
+                                    Model model) {
+        if (result.hasErrors()) {
+            final var pet = petClient.getPetById(id).orElseThrow(() -> new RuntimeException("No such pet for submitting appointment."));
+            model.addAttribute("pet", pet);
+            model.addAttribute("bookedDates", adoptionClient.getBookedDatesFor(id));
+            return "appointments/create";
+        }
+
+        try {
+            final var pet = petClient.getPetById(id).orElseThrow(() -> new RuntimeException("No such pet for submitting appointment."));
+            var username = ContextUtils.getCurrentUsername();
+            adoptionClient.createAppointment(username, id, pet.shelterId(), dto);
+            redirect.addFlashAttribute("successMessage", "You scheduled an appointment!");
+            return "redirect:/pets/" + id;
+        } catch (IllegalStateException ise) {
+            final var pet = petClient.getPetById(id).orElseThrow(() -> new RuntimeException("No such pet for submitting appointment."));
+            model.addAttribute("pet", pet);
+            model.addAttribute("bookedDates", adoptionClient.getBookedDatesFor(id));
+            model.addAttribute("errorMessage", ise.getMessage());
+            return "appointments/create";
+        } catch (Exception e) {
+            redirect.addFlashAttribute("errorMessage", "Failed to schedule your appointment.");
             return "redirect:/pets/" + id;
         }
     }

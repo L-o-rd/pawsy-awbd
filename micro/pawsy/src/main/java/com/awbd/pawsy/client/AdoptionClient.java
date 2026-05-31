@@ -74,6 +74,14 @@ public class AdoptionClient {
                 as.status())).toList();
     }
 
+    public List<String> getBookedDatesFor(final Long petId) {
+        final var type = new ParameterizedTypeReference<List<String>>() {};
+        return restClient.get()
+                .uri("/appointments/by-pet/{petId}/booked", petId)
+                .retrieve()
+                .body(type);
+    }
+
     public Optional<AdoptionResponse> getById(Long adoptionId) {
         try {
             var vas = restClient.get()
@@ -115,6 +123,21 @@ public class AdoptionClient {
         restClient.post()
                 .uri("/adoptions/for-pet/{petId}/at/{shelterId}/for-user/{username}",
                             petId, shelterId, username)
+                .body(dto)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void createAppointment(String username, Long petId, Long shelterId, AppointmentCreateRequest dto) {
+        final var pet = petClient.getPetById(petId).orElseThrow();
+        if (pet.status().equals("Adopted")) {
+            log.error("Adopter `{}` tried to book an appointment for adopted pet `{}` on {}.", username, petId, dto.appointmentDate().toString());
+            throw new IllegalStateException("This pet has already been adopted!");
+        }
+
+        restClient.post()
+                .uri("/appointments/for-pet/{petId}/at/{shelterId}/for-user/{username}",
+                        petId, shelterId, username)
                 .body(dto)
                 .retrieve()
                 .toBodilessEntity();
