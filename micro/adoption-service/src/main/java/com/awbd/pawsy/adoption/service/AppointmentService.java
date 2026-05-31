@@ -68,6 +68,10 @@ public class AppointmentService {
         return appointmentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Appointment %d was not found.".formatted(id)));
     }
 
+    public AppointmentSummary getById(Long id) {
+        return appointmentMapper.toSummary(get(id));
+    }
+
     public void cancel(Long id) {
         var appointment = get(id);
         if (appointment.getStatus() != AppointmentStatus.Ongoing) {

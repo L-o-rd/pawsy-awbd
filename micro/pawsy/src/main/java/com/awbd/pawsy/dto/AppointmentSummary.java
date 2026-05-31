@@ -1,7 +1,7 @@
-package com.awbd.pawsy.adoption.dto;
+package com.awbd.pawsy.dto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record AppointmentSummary(
     Long id,

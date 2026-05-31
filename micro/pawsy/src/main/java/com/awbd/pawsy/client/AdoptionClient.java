@@ -1,9 +1,6 @@
 package com.awbd.pawsy.client;
 
-import com.awbd.pawsy.dto.AdoptionCreateRequest;
-import com.awbd.pawsy.dto.AdoptionResponse;
-import com.awbd.pawsy.dto.AdoptionSummary;
-import com.awbd.pawsy.dto.PetResponse;
+import com.awbd.pawsy.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -61,6 +58,22 @@ public class AdoptionClient {
                 as.status())).toList();
     }
 
+    public List<AppointmentResponse> getAppointmentsForAdopter(final String username) {
+        final var type = new ParameterizedTypeReference<List<AppointmentSummary>>() {};
+        var vass = restClient.get()
+                .uri("/appointments/by-user/{username}", username)
+                .retrieve()
+                .body(type);
+
+        final var ass = requireNonNull(vass);
+        return ass.stream().map(as -> new AppointmentResponse(as.id(),
+                petClient.getPetById(as.petId()).orElseThrow(),
+                as.adopterName(),
+                as.appointmentDate(),
+                as.scheduledAtDate(),
+                as.status())).toList();
+    }
+
     public Optional<AdoptionResponse> getById(Long adoptionId) {
         try {
             var vas = restClient.get()
@@ -73,6 +86,25 @@ public class AdoptionClient {
                     petClient.getPetById(as.petId()).orElseThrow(),
                     as.adopterName(),
                     as.requestDate(),
+                    as.status()));
+        } catch (HttpClientErrorException.NotFound ignored) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<AppointmentResponse> getAppointmentById(Long appId) {
+        try {
+            var vas = restClient.get()
+                    .uri("/appointments/{appId}", appId)
+                    .retrieve()
+                    .body(AppointmentSummary.class);
+
+            final var as = requireNonNull(vas);
+            return Optional.of(new AppointmentResponse(as.id(),
+                    petClient.getPetById(as.petId()).orElseThrow(),
+                    as.adopterName(),
+                    as.appointmentDate(),
+                    as.scheduledAtDate(),
                     as.status()));
         } catch (HttpClientErrorException.NotFound ignored) {
             return Optional.empty();
@@ -101,6 +133,13 @@ public class AdoptionClient {
     public void rejectRequest(Long adoptionId) {
         restClient.post()
                 .uri("/adoptions/{adoptionId}/reject", adoptionId)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void cancelAppointment(Long appId) {
+        restClient.post()
+                .uri("/appointments/{appId}/cancel", appId)
                 .retrieve()
                 .toBodilessEntity();
     }

@@ -1,11 +1,11 @@
-package com.awbd.pawsy.adoption.dto;
+package com.awbd.pawsy.dto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
-public record AppointmentSummary(
+public record AppointmentResponse(
     Long id,
-    Long petId,
+    PetResponse pet,
     String adopterName,
     LocalDate appointmentDate,
     LocalDateTime scheduledAtDate,
