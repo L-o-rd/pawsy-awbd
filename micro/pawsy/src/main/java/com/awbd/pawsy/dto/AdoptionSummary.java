@@ -2,9 +2,9 @@ package com.awbd.pawsy.dto;
 
 import java.time.LocalDateTime;
 
-public record AdoptionResponse(
+public record AdoptionSummary(
     Long id,
-    PetResponse pet,
+    Long petId,
     String adopterName,
     LocalDateTime requestDate,
     String status

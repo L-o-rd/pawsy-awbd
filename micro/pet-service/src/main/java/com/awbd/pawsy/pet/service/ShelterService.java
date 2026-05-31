@@ -75,4 +75,8 @@ public class ShelterService {
         log.info("Shelter `{}` created, managed by user `{}`.", dto.name(), dto.manager());
         return shelter;
     }
+
+    public Long count() {
+        return shelterRepository.count();
+    }
 }
