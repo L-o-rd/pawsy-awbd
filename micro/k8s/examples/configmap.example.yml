@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pawsy-config
+data:
+  ADOPTION_SERVICE_URL: <replace-with-url>
+  USER_SERVICE_URL: <replace-with-url>
+  PET_SERVICE_URL: <replace-with-url>
+  ADOPTION_DB_NAME: <replace-with-db-name>
+  MYSQL_PORT: <replace-with-mysql-port>
+  USER_DB_NAME: <replace-with-db-name>
+  PET_DB_NAME: <replace-with-db-name>
