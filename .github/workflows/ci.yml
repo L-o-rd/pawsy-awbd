@@ -1,0 +1,60 @@
+name: Pawsy CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  mono-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Test Mono App
+        working-directory: mono
+        run: mvn clean test
+
+      - name: Build Mono App
+        working-directory: mono
+        run: mvn clean package -DskipTests
+
+
+  microservices:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - micro/pawsy
+          - micro/user-service
+          - micro/pet-service
+          - micro/adoption-service
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Package Service
+        run: mvn -f ${{ matrix.service }}/pom.xml clean package -DskipTests
+
+      - name: Docker Build Service
+        run: |
+          docker build \
+            -t ${{ matrix.service }}:${{ github.sha }} \
+            ${{ matrix.service }}
