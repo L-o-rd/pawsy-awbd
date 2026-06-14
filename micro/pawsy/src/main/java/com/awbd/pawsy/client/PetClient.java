@@ -2,6 +2,7 @@ package com.awbd.pawsy.client;
 
 import com.awbd.pawsy.dto.*;
 import com.awbd.pawsy.exception.AdoptionStateException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import javax.naming.ServiceUnavailableException;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,6 +85,14 @@ public class PetClient {
         }
     }
 
+    public Optional<PetResponse> getPetByIdFallback(Long petId, Exception ignored) throws ServiceUnavailableException {
+        log.error("Could not get pet by id `{}`, service unavailable.", petId);
+        throw new ServiceUnavailableException("Pet service is not available!");
+    }
+
+    @CircuitBreaker(
+            name = "petService",
+            fallbackMethod = "getPetByIdFallback")
     public Optional<PetResponse> getPetById(Long petId) {
         try {
             var response = restClient.get()
