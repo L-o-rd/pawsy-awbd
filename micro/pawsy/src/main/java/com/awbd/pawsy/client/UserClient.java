@@ -1,13 +1,14 @@
 package com.awbd.pawsy.client;
 
 import com.awbd.pawsy.dto.*;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
-import java.util.List;
+import javax.naming.ServiceUnavailableException;
 import java.util.Optional;
 
 @Slf4j
@@ -32,6 +33,14 @@ public class UserClient {
                 .toBodilessEntity();
     }
 
+    public Optional<UserResponse> getByUsernameFallback(String username, Exception ignored) throws ServiceUnavailableException {
+        log.error("Could not get `{}`, service unavailable.", username);
+        throw new ServiceUnavailableException("User service is not available!");
+    }
+
+    @CircuitBreaker(
+            name = "userService",
+            fallbackMethod = "getByUsernameFallback")
     public Optional<UserResponse> getByUsername(String username) {
         try {
             var response = restClient.get()
